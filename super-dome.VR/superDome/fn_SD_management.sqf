@@ -13,7 +13,7 @@ if !isServer exitWith {};
 	// Define where are your protect zones and stuff:
 		
 		SD_isOnSuperDome      = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
-		SD_isOnDebugGlobal    = false;   // true = a debug monitor visible / false = not visible. Default: false.
+		SD_isOnDebugGlobal    = true;   // true = a debug monitor visible / false = not visible. Default: false.
 		SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
 		SD_isProtectedPlayer  = true;    // true = Protected zones protect all player of the same side / false = doesnt protect. Default: true.
 		SD_isProtectedVehicle = true;    // true = Protected zones protect all vehicle inside / false = doesnt protect. Default: true.
