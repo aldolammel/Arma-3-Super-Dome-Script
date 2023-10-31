@@ -8,7 +8,7 @@ class Header {
 	onLoadName 				= "SD: SUPER-DOME SCRIPT";
 	author 					= "thy";
 	overviewPicture 		= "images\thumb.jpg";
-	onLoadMission 			= "A smart protection for players, vehicles and AI's when at base(s).";
+	onLoadMission 			= "SD is an Arma 3 script that's a smart protection for players, vehicles and AI's when at base(s) against damage.";
 	
 	// Gameplay
 	joinUnassigned 		= 1;

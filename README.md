@@ -1,22 +1,22 @@
 # Arma 3 / SD: Super Dome v1.0
 >*Dependencies: none.*
 
-SD is xxxxxxxxxxxxxxxxxxxxxxxxx.
+SD is an Arma 3 script that's a smart protection for players, vehicles and AI's when at base(s) against damage.
 
-Creation concept: xxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+Creation concept: soon.
 
 ## HOW TO INSTALL / DOCUMENTATION
 
 video demo: soon.
 
-Documentation: xxxxxxxxxxxxxxxxx
+Documentation: soon.
 
 __
 
 ## SCRIPT DETAILS
 
-- xxxxxxxxxxxxxxxxx;
-- xxxxxxxxxxxxxxxxx;
+- Soon;
+- Soon;
 - Full documentation available.
 
 __
@@ -29,5 +29,5 @@ __
 
 ## CHANGELOG
 
-**Nov, XXth 2023 | v1.0**
+**Oct, 31st 2023 | v1.0**
 - Hello world.
