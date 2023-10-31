@@ -1,0 +1,30 @@
+//BASIC CONFIGS
+class Header {
+	gameType 				= Sandbox;
+	minPlayers				= 1;
+	maxPlayers				= 4;
+};
+	// About
+	onLoadName 				= "SD: SUPER-DOME SCRIPT";
+	author 					= "thy";
+	overviewPicture 		= "images\thumb.jpg";
+	onLoadMission 			= "A smart protection for players, vehicles and AI's when at base(s).";
+	
+	// Gameplay
+	joinUnassigned 		= 1;
+	respawnButton 		= 0;
+	respawnDialog 		= 0;
+	debriefing 			= 0;
+	saving 				= 0;
+	enableDebugConsole 	= 1;
+	
+	// Performance
+	DisabledAI			= 1;
+	
+
+class CfgFunctions {
+
+	// SUPER DOME: PROTECTION FOR BASES
+	#include "superDome\THY_SD_functions.hpp"
+	
+};
