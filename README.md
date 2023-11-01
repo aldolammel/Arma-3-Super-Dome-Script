@@ -21,7 +21,7 @@ __
 - Turn ON/OFF the protected zones to cover all vehicles inside;
 - Turn ON/OFF the protected zones to cover all AI units inside;
 - Turn ON/OFF the protected zones to cover all players by side;
-- Smart speed limit (to desactivate the protection and accepts hard collisions) and wreck deletation when inside the zone;
+- Smart speed limit (to desactivate the protection and accept hard collisions) and wreck delete when inside the zone;
 - Debugging: friendly feedback messages;
 - Debugging: automatic errors handling;
 - Full documentation available.
