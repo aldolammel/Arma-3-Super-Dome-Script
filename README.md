@@ -23,7 +23,7 @@ __
 
 ## IDEA AND FIX?
 
-Discussion and known issues: soon.
+Discussion and known issues: https://forums.bohemia.net/forums/topic/244082-release-sd-super-dome-script-protecting-bases-and-zones/
 
 __
 

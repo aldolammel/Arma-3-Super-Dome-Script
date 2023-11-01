@@ -24,7 +24,7 @@ class Header {
 
 class CfgFunctions {
 
-	// SUPER DOME: PROTECTION FOR BASES
+	// SUPER DOME:
 	#include "superDome\THY_SD_functions.hpp"
 	
 };
