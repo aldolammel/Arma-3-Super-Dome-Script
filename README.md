@@ -15,8 +15,14 @@ __
 
 ## SCRIPT DETAILS
 
-- Soon;
-- Soon;
+- No dependencies from other mods or scripts;
+- SD works with two layers: player protection is managed by client-side, meanwhile vehicles and AI units by server-side; 
+- Set up to 10 protected zones easily with drag-and-drop Eden markers;
+- Turn ON/OFF the protected zones to cover all vehicles inside;
+- Turn ON/OFF the protected zones to cover all AI units inside;
+- Turn ON/OFF the protected zones to cover all players by side;
+- Debugging: friendly feedback messages;
+- Debugging: automatic errors handling;
 - Full documentation available.
 
 __
