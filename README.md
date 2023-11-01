@@ -9,7 +9,7 @@ Creation concept: soon.
 
 video demo: soon.
 
-Documentation: soon.
+Documentation: https://github.com/aldolammel/Arma-3-Super-Dome-Script/blob/main/super-dome.VR/superDome/_SD_Script_Documentation.pdf
 
 __
 
