@@ -104,7 +104,7 @@ THY_fnc_SD_debugMonitor = {
 			\n
 			\nYou are: %1
 			\nYour side: %2
-			\nYou protected now: %3
+			\nAre you protected: %3
 			\n
 			\n---
 			\n
