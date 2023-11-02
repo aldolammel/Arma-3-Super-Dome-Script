@@ -22,12 +22,6 @@ _debugMkr            = "";
 // Declarations:
 SD_clientSideStatus = "ON";
 publicVariable "SD_clientSideStatus";
-// Debug message:
-if SD_isOnDebugGlobal then {
-	systemChat format ["%1 Server-side status: .. %2", SD_debugHeader, SD_serverSideStatus];
-	systemChat format ["%1 Client-side status: .. ON (%2)", SD_debugHeader, name player];
-	systemChat format ["%1 Your side (%2) has %3 protected zones.", SD_debugHeader, playerSide, count _sideZonesCollection];
-};
 // Setting each SD Protected Zones (Markers):
 {  // forEach SD_zonesCollection:
 	// If zone is from the same player's side:
@@ -49,6 +43,12 @@ if SD_isOnDebugGlobal then {
 		};
 	};
 } forEach SD_zonesCollection;
+// Debug message:
+if SD_isOnDebugGlobal then {
+	systemChat format ["%1 Server-side status: .. %2", SD_debugHeader, SD_serverSideStatus];
+	systemChat format ["%1 Client-side status: .. ON (%2)", SD_debugHeader, name player];
+	systemChat format ["%1 Your side (%2) has %3 protected zones.", SD_debugHeader, playerSide, count _sideZonesCollection];
+};
 // Wait for the player be alive on the map:
 waitUntil { sleep 1; !isNull player };
 // Debug:
@@ -63,6 +63,9 @@ while { SD_isProtectedPlayer && alive player } do {
 		_mkr    = _x # 0;
 		_mkrPos = getMarkerPos _mkr;
 		_rng    = _x # 1;
+
+		systemChat format ["Aqui: %1", _mkrBooked];
+
 		// If this zone-marker is NOT already booked:
 		if ( _mkr isNotEqualTo _mkrBooked ) then {
 			// if player is into the base range, respecting the speed limit:
