@@ -1,9 +1,9 @@
-# Arma 3 / SD: Super Dome v1.0
+# Arma 3 / SD: Super Dome v1.2
 >*Dependencies: none.*
 
 SD is an Arma 3 script that's a smart protection for players, vehicles and AI's when at base(s) against damage.
 
-Creation concept: soon.
+Creation concept: turn specific game zones into safe places for players, areas proof against their enemies and themselves.
 
 ## HOW TO INSTALL / DOCUMENTATION
 
@@ -35,6 +35,16 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/244082-rele
 __
 
 ## CHANGELOG
+
+**Oct, XXst 2023 | v1.2**
+- Added > xxxxxxxxxxxxxxxxx;
+- Added > xxxxxxxxxxxxxxxxxx;
+- Fixed > xxxxxxxxxxxxxxxxxx;
+- Fixed > xxxxxxxxxxxxxxxxx;
+- Improved > Option to turn ON/OFF the markers of protected zones and its action ranges on the map;
+- Improved > Debugging > bunch of small improvements;
+- Improved > Debugging > All units are available in Zeus when debug mode is ON;
+- Documentation has been updated.
 
 **Oct, 31st 2023 | v1.0**
 - Hello world.

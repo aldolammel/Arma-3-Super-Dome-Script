@@ -1,22 +1,31 @@
-// SUPER DOME v1.0
+// SUPER DOME v1.2
 // File: your_mission\superDome\fn_SD_clientSide.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
 
 
-// Only players (incl. player host) can access:
-if ( !hasInterface || !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
+// Escape > Only players (incl. player host) can access:
+if ( !hasInterface || !SD_isOnSuperDome ) exitWith {};
+// Escape > If players are not protected:
+if !SD_isProtectedPlayer exitWith {
+	// Remind message:
+	if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
+		["%1 WARNING > Players are NOT protected by Super-Dome script. Check the 'fn_SD_management.sqf' file.",
+		SD_warningHeader] call BIS_fnc_error;
+	};
+};
 
 [] spawn {
 
 	//params [""];
-	private ["_mkr", "_rng", "_booking", "_protectedMkrs"];
+	private ["_mkr", "_rng", "_booking", "_protectedMkrs", "_debugMkr"];
 
 	// Initial values:
 	_mkr           = objNull;
 	_rng           = nil; 
 	_booking       = [""];
 	_protectedMkrs = [];
+	_debugMkr      = "";
 	// Declarations:
 		// Reserved space:
 	// Debug message:
@@ -24,12 +33,27 @@ if ( !hasInterface || !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
 		systemChat format ["%1 ServerSide status... %2", SD_debugHeader, SD_serverSideStatus];
 		systemChat format ["%1 ClientSide status... (%2) Running!", SD_debugHeader, name player];
 	};
-	{  // forEach SD_protectedMkrsInfo:
-		// Checks if should hide the protected-markers:
-		if !SD_isOnDebugGlobal then { (_x # 0) setMarkerAlpha 0 } else { (_x # 0) setMarkerAlpha 1 };
-		// If marker is from the same player's side, consider the marker as valid protected zone:
-		if ( (_x # 2) isEqualTo playerSide ) then { _protectedMkrs pushBack _x };
-	} forEach SD_protectedMkrsInfo;
+	// Setting each SD Protected Zones (Markers):
+	{  // forEach SD_zonesCollection:
+		// If mkr is from the same player's side:
+		if ( (_x # 2) isEqualTo playerSide ) then {
+			// Add as valid mkr for this player:
+			_protectedMkrs pushBack _x;
+			// If it's to show the protected marker:
+			if ( SD_isOnDebugGlobal || SD_isOnShowMarkers ) then {
+				// Marker position visible:
+				(_x # 0) setMarkerAlpha 1;
+				// Set an uncommitted visible protection range:
+				_debugMkr = createMarker ["SD_RANGE_"+(_x # 0), getMarkerPos (_x # 0)];
+				_debugMkr setMarkerShape "ELLIPSE";
+				_debugMkr setMarkerSize [(_x # 1), (_x # 1)];
+				_debugMkr setMarkerBrush "Border";
+				_debugMkr setMarkerColor "ColorWhite";
+				_debugMkr setMarkerAlpha 1;
+				//_debugMkr setMarkerDrawPriority 1;  // WIP
+			};
+		};
+	} forEach SD_zonesCollection;
 	// Wait for the player be alive on the map:
 	waitUntil { sleep 1; !isNull player };
 	// Debug:
@@ -55,7 +79,12 @@ if ( !hasInterface || !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
 						// It does the booking:
 						_booking = [_mkr];
 						// Message:
-						if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then { systemChat format ["%1 You're in a protected zone (%2).", if SD_isOnAlerts then {SD_alertHeader} else {SD_debugHeader}, _mkr]; sleep 1 };
+						if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
+							systemChat format ["%1 You're in a protected zone%2.",
+							SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}];
+							// Message breath:
+							sleep 1;
+						};
 					};
 				// If this base-marker is already booked:
 				} else {
@@ -66,7 +95,12 @@ if ( !hasInterface || !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
 						// Undo the booking:
 						_booking = [""];
 						// Message:
-						if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then { systemChat format ["%1 You left the protected zone (%2).", if SD_isOnAlerts then {SD_alertHeader} else {SD_debugHeader}, _mkr]; sleep 1 };
+						if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
+							systemChat format ["%1 You left the protected zone%2.",
+							SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}]; 
+							// Message breath:
+							sleep 1;
+						};
 					};
 				};
 				// Breath:

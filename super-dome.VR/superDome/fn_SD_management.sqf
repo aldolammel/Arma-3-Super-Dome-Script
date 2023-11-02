@@ -1,4 +1,4 @@
-// SUPER DOME v1.0
+// SUPER DOME v1.2
 // File: your_mission\superDome\fn_SD_management.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -10,18 +10,20 @@ if !isServer exitWith {};
 [] spawn {
 
 	// EDITOR'S OPTIONS ////////////////////////////////////////////////////////////////////////////////////////////////
-	// Define where are your protect zones and stuff:
+	// Define where are your protected zones and stuff:
 		
 		SD_isOnSuperDome      = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
 		SD_isOnDebugGlobal    = true;   // true = a debug monitor visible / false = not visible. Default: false.
+		SD_isOnZeusWhenDebug  = true;    // true = when debugging, all protected things will be added to zeus. Default: false.
 		SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
-		SD_isProtectedPlayer  = true;    // true = Protected zones protect all player of the same side / false = doesnt protect. Default: true.
-		SD_isProtectedVehicle = true;    // true = Protected zones protect all vehicle inside / false = doesnt protect. Default: true.
-		SD_isProtectedAI      = true;    // true = Protected zones protect all AI units inside / false = doesnt protect. Default: true.
+		SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
+		SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons inside / false = doesnt protect. Default: true.
+		SD_isProtectedAI      = true;    // true = zones protect all AI units inside / false = doesnt protect. Default: true.
+		SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
 		SD_checkDelay         = 3;       // in seconds, time before the next protection check. Default: 3.
 
 		// PROTECTED ZONES
-		// Define each protected zones you are running. Leave the _protectedMkrXX empty ("") to ignore a slot:
+		// Define each protected zones you are running. Leave the _protectedMkrXX empty ("") to ignore the slot:
 
 		private _protectedMkr01 = "superdome_1";      // Protected zone marker 1 name.
 		private _mkrDisRange01  = 50;                 // in meters, the protection range of the marker 1.
@@ -66,23 +68,26 @@ if !isServer exitWith {};
 
 		// ADVANCED:
 		// Which types of vehicles the SD should scan if SD_isProtectedVehicle is true:
-		SD_scanVehTypes = ["Car", "Tank", "Plane", "Submarine", "Helicopter", "Motocycle", "Ship", "StaticWeapon"];
-
+		SD_scanVehTypes    = ["Car", "Tank", "Plane", "Submarine", "Helicopter", "Motocycle", "Ship", "StaticWeapon"];
+		// In seconds, how much time players got to fix vehicle position before it been deleted when it get upside-down in a protected zone:
+		SD_vehDelTolerance = 60;
 
 
 	// DONT TOUCH //////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Local variables declaration:
-	private ["_protectedMkrs"];
+	private ["_zones"];
 	// Initial values:
-	SD_protectedMkrsInfo    = [];
+	SD_zonesCollection  = [];
 	SD_serverSideStatus = "Failed.";
 	// Declarations:
 	SD_debugHeader   = toUpper "SD DEBUG >";
 	SD_warningHeader = toUpper "SD WARNING >";
 	SD_alertHeader   = toUpper "SUPERDOME INFO >";
 	SD_speedLimit    = 30;
+	SD_vehLeaning    = 0.5;
+	SD_isRemoving    = false;
 	// Building the array structure for further steps:
-	_protectedMkrs = [
+	_zones = [
 		[_protectedMkr01, _mkrDisRange01, _mkrSide01, nil, nil],  // nil1 = [vehs classnames further], nil2 = [ai groups further]
 		[_protectedMkr02, _mkrDisRange02, _mkrSide02, nil, nil],
 		[_protectedMkr03, _mkrDisRange03, _mkrSide03, nil, nil],
@@ -95,7 +100,7 @@ if !isServer exitWith {};
 		[_protectedMkr10, _mkrDisRange10, _mkrSide10, nil, nil]
 	];
 	// Cleaning the empty markers and those ones with irregular marker types:
-	{  // forEach _protectedMkrs:
+	{  // forEach _zones:
 		// If marker's name is not empty:
 		if ( (_x # 0) isNotEqualTo "" ) then { 
 			// If marker has a valid shape type:
@@ -105,7 +110,7 @@ if !isServer exitWith {};
 					// Check if the side is declared:
 					if ( (_x # 2) isEqualTo BLUFOR || (_x # 2) isEqualTo OPFOR || (_x # 2) isEqualTo INDEPENDENT || (_x # 2) isEqualTo CIVILIAN ) then {
 						// Adds the marker as a valid protected zone:
-						SD_protectedMkrsInfo pushBack _x;
+						SD_zonesCollection pushBack _x;
 					// Otherwise:
 					} else {
 						// Warning message:
@@ -129,25 +134,27 @@ if !isServer exitWith {};
 				SD_warningHeader, toUpper (_x # 0)];
 			};
 		};
-	} forEach _protectedMkrs;
+	} forEach _zones;
 	// Configuring each valid protected zone:
-	{  // forEach SD_protectedMkrsInfo:
-		// Defining the name of each marker:
-		(_x # 0) setMarkerText format [" Protected zone (%1)", _x # 0];
-		// Defining the color of each marker:
+	{  // forEach SD_zonesCollection:
+		// Setting the mkr name:
+		(_x # 0) setMarkerText format [" Protected zone %1", if SD_isOnDebugGlobal then {"("+(_x # 0)+")"} else {""}];
+		// Setting the mkr color:
 		switch (_x # 2) do {
 			case BLUFOR:      { (_x # 0) setMarkerColor "colorBLUFOR" };
 			case OPFOR:       { (_x # 0) setMarkerColor "colorOPFOR" };
 			case INDEPENDENT: { (_x # 0) setMarkerColor "colorIndependent" };
 			case CIVILIAN:    { (_x # 0) setMarkerColor "colorCivilian" };
 		};
-	} forEach SD_protectedMkrsInfo;
+		// Hide the mkr on server-side when NOT in debug-mode:
+		if !SD_isOnDebugGlobal then { (_x # 0) setMarkerAlpha 0 } else { (_x # 0) setMarkerAlpha 1 };
+	} forEach SD_zonesCollection;
 	// Debug message:
-	if SD_isOnDebugGlobal then { systemChat format ["%1 Using %2 valid protected zone(s).", SD_debugHeader, count SD_protectedMkrsInfo] };
+	if SD_isOnDebugGlobal then { systemChat format ["%1 Using %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
 	// Mission editor other warnings:
 	if (SD_checkDelay < 2) then {systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warningHeader, SD_checkDelay]}; if (SD_checkDelay > 5) then {systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warningHeader, SD_checkDelay]}; if ( SD_speedLimit isNotEqualTo 30 ) then {systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warningHeader]};
 	// Declaring the global variables:
-	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnAlerts"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_checkDelay"; publicVariable "SD_debugHeader"; publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_scanVehTypes"; publicVariable "SD_protectedMkrsInfo"; publicVariable "SD_serverSideStatus";
+	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug";  publicVariable "SD_isOnAlerts"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_checkDelay"; publicVariable "SD_debugHeader"; publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_vehLeaning"; publicVariable "SD_isRemoving"; publicVariable "SD_scanVehTypes"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus";
 };
 // return:
 true;

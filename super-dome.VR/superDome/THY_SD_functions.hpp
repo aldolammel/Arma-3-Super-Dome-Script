@@ -1,4 +1,4 @@
-// SUPER DOME v1.0
+// SUPER DOME v1.2
 // File: your_mission\superDome\THY_functions.hpp
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
