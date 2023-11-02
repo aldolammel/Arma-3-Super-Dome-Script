@@ -72,7 +72,7 @@ if !isServer exitWith {};
 		// Scan to collect AI units:
 		if SD_isProtectedAI then {
 			// Looking for AI units:
-			_result = (_mkrPos nearEntities ["Man", _rng]) select { alive _x && _x isKindOf "CAManBase" && side _x isEqualTo _side };
+			_result = ((_mkrPos nearEntities ["Man", _rng]) - allPlayers) select { alive _x && _x isKindOf "CAManBase" && side _x isEqualTo _side };
 			// Recording them:
 			_mkrInfo set [4, _result];  // if empty, at least change the array index-value from nil to array (empty).
 			// Adding to Zeus when debugging:

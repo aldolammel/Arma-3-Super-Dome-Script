@@ -41,6 +41,7 @@ __
 - Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
 - Added > When vehicle and player approach the protected zone too fast, the protection for them is disabled;
 - Improved > Option to turn ON/OFF the markers of protected zones and its action ranges on the map;
+- Fixed > AI protection was conflicting with Player protection when the player went to another protected zone from the same side;
 - Improved > Debugging > bunch of small improvements;
 - Improved > Debugging > Protected units, vehicles and turrets are editable by Zeus when debug is ON;
 - Documentation has been updated.
