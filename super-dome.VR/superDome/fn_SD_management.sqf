@@ -18,7 +18,7 @@ if !isServer exitWith {};
 			SD_isOnZeusWhenDebug  = true;   // true = when debugging only, all protected things will be added to zeus. Default: false.
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
-			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons inside / false = doesnt protect. Default: true.
+			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons that spawn inside / false = doesnt protect. Default: true.
 			SD_isProtectedAI      = true;   // WIP // true = zones protect all AI units inside / false = doesnt protect. Default: false.
 			// Customs:
 			SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.

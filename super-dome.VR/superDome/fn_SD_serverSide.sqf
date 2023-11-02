@@ -56,7 +56,7 @@ if !isServer exitWith {};
 		_mkrPos  = getMarkerPos _mkr;
 		// Scan to collect vehicles:
 		if SD_isProtectedVehicle then {
-			// Looking for vehicles:
+			// Looking for vehicles and static turrets:
 			_result = nearestObjects [_mkrPos, SD_scanVehTypes, _rng];
 			// Recording them:
 			_mkrInfo set [3, _result];  // if empty, at least change the array index-value from nil to array (empty).
@@ -158,6 +158,7 @@ if !isServer exitWith {};
 					if ( alive _x && _x distance _mkrPos <= _rng ) then {
 						// Makes the unit immortal:
 						_x allowDamage false;
+						//
 					// Otherwise:
 					} else {
 						// Restores the unit condition:
