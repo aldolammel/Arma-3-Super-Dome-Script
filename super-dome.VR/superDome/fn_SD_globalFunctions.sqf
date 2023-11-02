@@ -96,39 +96,39 @@ THY_fnc_SD_debugMonitor = {
 	params ["_unit"];
 	//private [];
 	
-	// Monitor:
-	hintSilent format [
-		"\n
-		\n--- SUPER DOME DEBUG ---
-		\n
-		\nYou are: %1
-		\nYour side: %2
-		\nYou protected now: %3
-		\n
-		\n---
-		\n
-		\nPlayers protection: %4
-		\nVehs protection: %5
-		\nAI protection: %6
-		\nSD player alerts: %7
-		\nSD visible markers: %8
-		\nSD stuff on Zeus: %9
-		\n
-		\n",
-		name _unit,
-		playerSide,
-		if (isDamageAllowed _unit) then {"NOPE!"} else {"YES!"},
-		if SD_isProtectedPlayer then {"ON"} else {"OFF"},
-		if SD_isProtectedVehicle then {"ON"} else {"OFF"},
-		if SD_isProtectedAI then {"ON"} else {"OFF"},
-		if SD_isOnAlerts then {"ON"} else {"OFF"},
-		if SD_isOnShowMarkers then {"ON"} else {"OFF"},
-		if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"}
-	];
-	// Breath:
-	sleep 3;
-	// Restart the function:
-	[_unit] spawn THY_fnc_SD_debugMonitor;
+	while { SD_isOnDebugGlobal } do {
+		// Monitor:
+		hintSilent format [
+			"\n
+			\n--- SUPER DOME DEBUG ---
+			\n
+			\nYou are: %1
+			\nYour side: %2
+			\nYou protected now: %3
+			\n
+			\n---
+			\n
+			\nPlayers protection: %4
+			\nVehs protection: %5
+			\nAI protection: %6
+			\nSD player alerts: %7
+			\nSD visible markers: %8
+			\nSD stuff on Zeus: %9
+			\n
+			\n",
+			name _unit,
+			playerSide,
+			if (isDamageAllowed _unit) then {"NOPE!"} else {"YES!"},
+			if SD_isProtectedPlayer then {"ON"} else {"OFF"},
+			if SD_isProtectedVehicle then {"ON"} else {"OFF"},
+			if SD_isProtectedAI then {"ON"} else {"OFF"},
+			if SD_isOnAlerts then {"ON"} else {"OFF"},
+			if SD_isOnShowMarkers then {"ON"} else {"OFF"},
+			if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"}
+		];
+		// Breath:
+		sleep 3;
+	};
 	// Return:
 	true;
 };

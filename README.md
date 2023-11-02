@@ -37,13 +37,13 @@ __
 ## CHANGELOG
 
 **Oct, XXst 2023 | v1.2**
-- Added > xxxxxxxxxxxxxxxxx;
-- Added > xxxxxxxxxxxxxxxxxx;
+- Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
+- Added > When vehicle and player approach the protected zone too fast, the protection for them is disabled;
 - Fixed > xxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxx;
 - Improved > Option to turn ON/OFF the markers of protected zones and its action ranges on the map;
 - Improved > Debugging > bunch of small improvements;
-- Improved > Debugging > All units are available in Zeus when debug mode is ON;
+- Improved > Debugging > Protected units, vehicles and turrets are editable by Zeus when debug is ON;
 - Documentation has been updated.
 
 **Oct, 31st 2023 | v1.0**

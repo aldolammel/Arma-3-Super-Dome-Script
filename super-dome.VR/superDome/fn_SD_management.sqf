@@ -12,75 +12,87 @@ if !isServer exitWith {};
 	// EDITOR'S OPTIONS ////////////////////////////////////////////////////////////////////////////////////////////////
 	// Define where are your protected zones and stuff:
 		
-		SD_isOnSuperDome      = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
-		SD_isOnDebugGlobal    = true;   // true = a debug monitor visible / false = not visible. Default: false.
-		SD_isOnZeusWhenDebug  = true;    // true = when debugging, all protected things will be added to zeus. Default: false.
-		SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
-		SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
-		SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons inside / false = doesnt protect. Default: true.
-		SD_isProtectedAI      = true;    // true = zones protect all AI units inside / false = doesnt protect. Default: true.
-		SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
-		SD_checkDelay         = 3;       // in seconds, time before the next protection check. Default: 3.
+		SD_isOnSuperDome          = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
+			// Debugging:
+			SD_isOnDebugGlobal    = true;   // true = make your tests easier / false = turn it off. Default: false.
+			SD_isOnZeusWhenDebug  = false;   // true = when debugging only, all protected things will be added to zeus. Default: false.
+			// Protections:
+			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
+			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons inside / false = doesnt protect. Default: true.
+			SD_isProtectedAI      = true;   // true = zones protect all AI units inside / false = doesnt protect. Default: false.
+			// Customs:
+			SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
+			SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
 
 		// PROTECTED ZONES
 		// Define each protected zones you are running. Leave the _protectedMkrXX empty ("") to ignore the slot:
 
-		private _protectedMkr01 = "superdome_1";      // Protected zone marker 1 name.
-		private _mkrDisRange01  = 50;                 // in meters, the protection range of the marker 1.
-		private _mkrSide01      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr01 = "superdome_1";      // Protected zone marker 1 name.
+			private _mkrDisRange01  = 50;                 // in meters, the protection range of the marker 1.
+			private _mkrSide01      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr02 = "superdome_2";       // Protected zone marker 2 name.
-		private _mkrDisRange02  = 50;                  // in meters, the protection range of the marker 2.
-		private _mkrSide02      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr02 = "superdome_2";       // Protected zone marker 2 name.
+			private _mkrDisRange02  = 50;                  // in meters, the protection range of the marker 2.
+			private _mkrSide02      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr03 = "";                  // Protected zone marker 3 name.
-		private _mkrDisRange03  = 100;                 // in meters, the protection range of the marker 3.
-		private _mkrSide03      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr03 = "superdome_3";                  // Protected zone marker 3 name.
+			private _mkrDisRange03  = 50;                 // in meters, the protection range of the marker 3.
+			private _mkrSide03      = OPFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr04 = "";                  // Protected zone marker 4 name.
-		private _mkrDisRange04  = 100;                 // in meters, the protection range of the marker 4.
-		private _mkrSide04      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr04 = "";                  // Protected zone marker 4 name.
+			private _mkrDisRange04  = 100;                 // in meters, the protection range of the marker 4.
+			private _mkrSide04      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr05 = "";                  // Protected zone marker 5 name.
-		private _mkrDisRange05  = 100;                 // in meters, the protection range of the marker 5.
-		private _mkrSide05      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr05 = "";                  // Protected zone marker 5 name.
+			private _mkrDisRange05  = 100;                 // in meters, the protection range of the marker 5.
+			private _mkrSide05      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr06 = "";                  // Protected zone marker 6 name.
-		private _mkrDisRange06  = 100;                 // in meters, the protection range of the marker 6.
-		private _mkrSide06      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr06 = "";                  // Protected zone marker 6 name.
+			private _mkrDisRange06  = 100;                 // in meters, the protection range of the marker 6.
+			private _mkrSide06      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr07 = "";                  // Protected zone marker 7 name.
-		private _mkrDisRange07  = 100;                 // in meters, the protection range of the marker 7.
-		private _mkrSide07      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr07 = "";                  // Protected zone marker 7 name.
+			private _mkrDisRange07  = 100;                 // in meters, the protection range of the marker 7.
+			private _mkrSide07      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr08 = "";                  // Protected zone marker 8 name.
-		private _mkrDisRange08  = 100;                 // in meters, the protection range of the marker 8.
-		private _mkrSide08      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr08 = "";                  // Protected zone marker 8 name.
+			private _mkrDisRange08  = 100;                 // in meters, the protection range of the marker 8.
+			private _mkrSide08      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr09 = "";                  // Protected zone marker 9 name.
-		private _mkrDisRange09  = 100;                 // in meters, the protection range of the marker 9.
-		private _mkrSide09      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr09 = "";                  // Protected zone marker 9 name.
+			private _mkrDisRange09  = 100;                 // in meters, the protection range of the marker 9.
+			private _mkrSide09      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-		private _protectedMkr10 = "";                  // Protected zone marker 10 name.
-		private _mkrDisRange10  = 100;                 // in meters, the protection range of the marker 10.
-		private _mkrSide10      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
+			private _protectedMkr10 = "";                  // Protected zone marker 10 name.
+			private _mkrDisRange10  = 100;                 // in meters, the protection range of the marker 10.
+			private _mkrSide10      = BLUFOR;              // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 	
 
 		// ADVANCED:
-		// Which types of vehicles the SD should scan if SD_isProtectedVehicle is true:
-		SD_scanVehTypes    = ["Car", "Tank", "Plane", "Submarine", "Helicopter", "Motocycle", "Ship", "StaticWeapon"];
-		// In seconds, how much time players got to fix vehicle position before it been deleted when it get upside-down in a protected zone:
-		SD_vehDelTolerance = 60;
+		// Be careful even more here:
+
+			// In seconds, time before the next protection check:
+			SD_checkDelay      = 3;  // Default 3.
+			// In seconds, how much time players got to fix vehicle position before it been deleted when it get upside-down in a protected zone:
+			SD_vehDelTolerance = 60;  // Default 60.
+			// Which types of vehicles the SD should scan if SD_isProtectedVehicle is true:
+			SD_scanVehTypes    = ["Car", "Tank", "Plane", "Submarine", "Helicopter", "Motocycle", "Ship", "StaticWeapon"];
 
 
 	// DONT TOUCH //////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Local variables declaration:
 	private ["_zones"];
+	// Declarations - part 1/2:
+	SD_debugHeader = toUpper "SD DEBUG >";
+	// Declaring the global variables - part 1/2:
+	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_isOnAlerts"; publicVariable "SD_checkDelay"; publicVariable "SD_debugHeader";
+	// Escape:
+	if ( !SD_isOnSuperDome || { !SD_isProtectedPlayer && !SD_isProtectedVehicle && !SD_isProtectedAI } ) exitWith { if SD_isOnDebugGlobal then { systemChat format ["%1 Super-Dome was shut down by the mission editor!", SD_debugHeader] } };
 	// Initial values:
 	SD_zonesCollection  = [];
-	SD_serverSideStatus = "Failed.";
-	// Declarations:
-	SD_debugHeader   = toUpper "SD DEBUG >";
+	SD_serverSideStatus = "OFF";
+	SD_clientSideStatus = "OFF";
+	// Declarations - part 2/2:
 	SD_warningHeader = toUpper "SD WARNING >";
 	SD_alertHeader   = toUpper "SUPERDOME INFO >";
 	SD_speedLimit    = 30;
@@ -150,11 +162,11 @@ if !isServer exitWith {};
 		if !SD_isOnDebugGlobal then { (_x # 0) setMarkerAlpha 0 } else { (_x # 0) setMarkerAlpha 1 };
 	} forEach SD_zonesCollection;
 	// Debug message:
-	if SD_isOnDebugGlobal then { systemChat format ["%1 Using %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
+	if SD_isOnDebugGlobal then { systemChat format ["%1 Found %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
 	// Mission editor other warnings:
 	if (SD_checkDelay < 2) then {systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warningHeader, SD_checkDelay]}; if (SD_checkDelay > 5) then {systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warningHeader, SD_checkDelay]}; if ( SD_speedLimit isNotEqualTo 30 ) then {systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warningHeader]};
-	// Declaring the global variables:
-	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug";  publicVariable "SD_isOnAlerts"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_checkDelay"; publicVariable "SD_debugHeader"; publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_vehLeaning"; publicVariable "SD_isRemoving"; publicVariable "SD_scanVehTypes"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus";
+	// Declaring the global variables - part 2/2:
+	publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_vehLeaning"; publicVariable "SD_isRemoving"; publicVariable "SD_scanVehTypes"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus";
 };
 // return:
 true;

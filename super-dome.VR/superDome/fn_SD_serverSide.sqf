@@ -4,11 +4,12 @@
 // by thy (@aldolammel)
 
 
-// Escapes:
-if ( !isServer || !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI } ) exitWith {};
+if !isServer exitWith {};
 
 [] spawn {
-
+	// Escape:
+	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
+	
 	//params [""];
 	private ["_mkrInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_result", "_mkrPos", "_crew", "_zonesNum"];
 
@@ -23,9 +24,14 @@ if ( !isServer || !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtect
 	_mkrPos   = [];
 	_crew     = [];
 	// Declarations:
-	SD_serverSideStatus = "Running!";
+	SD_serverSideStatus = "ON";
 	publicVariable "SD_serverSideStatus";
 	_zonesNum = count SD_zonesCollection - 1;
+	// Debug message to everyone if client-side if OFF:
+	if ( SD_isOnDebugGlobal && !SD_isProtectedPlayer ) then {
+		[format ["%1 Server-side status: .. ON", SD_debugHeader]] remoteExec ["systemChat", 0];
+		[format ["%1 Client-side status: .. %2", SD_debugHeader, SD_clientSideStatus]] remoteExec ["systemChat", 0];
+	};
 	// Wait for the match get started:
 	waitUntil { sleep 1; time > 1 };
 
@@ -93,7 +99,7 @@ if ( !isServer || !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtect
 	publicVariable "SD_zonesCollection";
 
 	// STEP 2 - PROTECT THEM:
-	while { SD_isOnSuperDome } do {
+	while { SD_isProtectedVehicle || SD_isProtectedAI } do {
 		// Check each protected zone:
 		for "_i" from 0 to _zonesNum do {
 			// Internal Declarations:
