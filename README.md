@@ -1,7 +1,7 @@
 # Arma 3 / SD: Super Dome v1.2
 >*Dependencies: none.*
 
-SD is an Arma 3 script that's a smart protection for players, vehicles and AI's when at base(s) against damage.
+SD is an Arma 3 script that's a smart protection against damage for players, vehicles and AI units when them are within editable zones. The protected zones have automatic removal of wrecks and overturned vehicles, in addition to small automations relating to the protected zones integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
 
 Creation concept: turn specific game zones into safe places for players, areas proof against their enemies and themselves.
 
@@ -18,9 +18,10 @@ __
 - No dependencies from other mods or scripts;
 - SD works with two layers: player protection is managed by client-side, meanwhile vehicles and AI units by server-side; 
 - Set up to 10 protected zones easily with drag-and-drop Eden markers;
-- Turn ON/OFF the protected zones to cover all vehicles inside;
+- Turn ON/OFF the protected zones to cover all vehicles and static-turrets inside;
 - Turn ON/OFF the protected zones to cover all AI units inside;
 - Turn ON/OFF the protected zones to cover all players by side;
+- Auto-removal for wrecks and rolled over vehicles in the zone;
 - Smart speed limit (to desactivate the protection and accept hard collisions) and wreck delete when inside the zone;
 - Debugging: friendly feedback messages;
 - Debugging: automatic errors handling;
@@ -39,8 +40,6 @@ __
 **Oct, XXst 2023 | v1.2**
 - Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
 - Added > When vehicle and player approach the protected zone too fast, the protection for them is disabled;
-- Fixed > xxxxxxxxxxxxxxxxxx;
-- Fixed > xxxxxxxxxxxxxxxxx;
 - Improved > Option to turn ON/OFF the markers of protected zones and its action ranges on the map;
 - Improved > Debugging > bunch of small improvements;
 - Improved > Debugging > Protected units, vehicles and turrets are editable by Zeus when debug is ON;

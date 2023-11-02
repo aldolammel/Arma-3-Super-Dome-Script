@@ -10,12 +10,13 @@ if !hasInterface exitWith {};
 if ( !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
 
 //params [""];
-private ["_mkr", "_rng", "_booking", "_sideZonesCollection", "_debugMkr"];
+private ["_mkr", "_mkrPos", "_rng", "_mkrBooked", "_sideZonesCollection", "_debugMkr"];
 
 // Initial values:
 _mkr                 = objNull;
+_mkrPos              = [];
 _rng                 = nil; 
-_booking             = [""];
+_mkrBooked           = "";
 _sideZonesCollection = [];
 _debugMkr            = "";
 // Declarations:
@@ -56,55 +57,48 @@ if SD_isOnDebugGlobal then {
 	[player] spawn THY_fnc_SD_debugMonitor;
 };
 // Looping to check the protected zones:
-while { SD_isProtectedPlayer } do {
-	// If player alive:
-	if ( alive player ) then {
-		{  // forEach _sideZonesCollection:
-			// Declarations:
-			_mkr = _x # 0;
-			_rng = _x # 1;
-			//private _side = _x # 2;
-			// If this base-marker is NOT already booked:
-			if ( (_booking # 0) isNotEqualTo _mkr ) then {
-				// if player is into the base range, respecting the speed limit:
-				if ( player distance (getMarkerPos _mkr) <= _rng && abs (speed player) < SD_speedLimit ) then {
-					// Makes player immortal:
-					player allowDamage false;
-					// It does the booking:
-					_booking = [_mkr];
-					// Message:
-					if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
-						systemChat format ["%1 You're in a protected zone%2.",
-						SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}];
-						// Message breath:
-						sleep 1;
-					};
-				};
-			// If this base-marker is already booked:
-			} else {
-				// if player is out of the current booked base range:
-				if ( (_booking # 0) isNotEqualTo "" && player distance (getMarkerPos _mkr) > _rng ) then {
-					// Restores the player mortality:
-					player allowDamage true;
-					// Undo the booking:
-					_booking = [""];
-					// Message:
-					if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
-						systemChat format ["%1 You left the protected zone%2.",
-						SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}]; 
-						// Message breath:
-						sleep 1;
-					};
+while { SD_isProtectedPlayer && alive player } do {
+	{  // forEach _sideZonesCollection:
+		// Internal Declarations:
+		_mkr    = _x # 0;
+		_mkrPos = getMarkerPos _mkr;
+		_rng    = _x # 1;
+		// If this zone-marker is NOT already booked:
+		if ( _mkr isNotEqualTo _mkrBooked ) then {
+			// if player is into the base range, respecting the speed limit:
+			if ( player distance _mkrPos <= _rng && abs (speed player) < SD_speedLimit ) then {
+				// Makes player immortal:
+				player allowDamage false;
+				// It does the booking:
+				_mkrBooked = _mkr;
+				// Message:
+				if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
+					systemChat format ["%1 You're in a protected zone%2.",
+					SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}];
+					// Message breath:
+					sleep 1;
 				};
 			};
-			// Breath:
-			sleep 0.2;
-		} forEach _sideZonesCollection;
-	// If player is dead:
-	} else {
-		// Redundancy to make sure no immortal bugs:
-		_booking = [""];
-	};
+		// If this zone-marker is already booked:
+		} else {
+			// if player is out of the current booked zone:
+			if ( _mkr isEqualTo _mkrBooked && player distance _mkrPos > _rng ) then {
+				// Restores the player mortality:
+				player allowDamage true;
+				// Undo the booking:
+				_mkrBooked = "";
+				// Message:
+				if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
+					systemChat format ["%1 You left the protected zone%2.",
+					SD_alertHeader, if SD_isOnDebugGlobal then {" ("+_mkr+")"} else {""}]; 
+					// Message breath:
+					sleep 1;
+				};
+			};
+		};
+		// Breath:
+		sleep 0.2;
+	} forEach _sideZonesCollection;
 	// CPU breath:
 	sleep SD_checkDelay;
 }; // while-looping ends.
