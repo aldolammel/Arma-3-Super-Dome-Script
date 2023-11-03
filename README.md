@@ -37,7 +37,7 @@ __
 
 ## CHANGELOG
 
-**Oct, XXst 2023 | v1.2**
+**Nov, 3rd 2023 | v1.2**
 - Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
 - Added > When vehicle and player approach the protected zone too fast, the protection for them is disabled;
 - Improved > Option to turn ON/OFF the markers of protected zones and its action ranges on the map;
