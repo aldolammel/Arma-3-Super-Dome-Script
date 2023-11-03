@@ -1,4 +1,4 @@
-// SUPER DOME v1.2
+// SUPER DOME v1.5
 // File: your_mission\superDome\fn_SD_management.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -14,12 +14,12 @@ if !isServer exitWith {};
 		
 		SD_isOnSuperDome          = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
 			// Debugging:
-			SD_isOnDebugGlobal    = false;   // true = make your tests easier / false = turn it off. Default: false.
-			SD_isOnZeusWhenDebug  = false;   // true = when debugging only, all protected things will be added to zeus. Default: false.
+			SD_isOnDebugGlobal    = true;   // true = make your tests easier / false = turn it off. Default: false.
+			SD_isOnZeusWhenDebug  = true;   // true = when debugging only, all protected things will be added to zeus. Default: false.
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
 			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons that spawn inside / false = doesnt protect. Default: true.
-			SD_isProtectedAI      = false;   // true = zones protect all AI units inside / false = doesnt protect. Default: false.
+			SD_isProtectedAI      = true;   // true = zones protect all AI units inside / false = doesnt protect. Default: false.
 			// Customs:
 			SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
 			SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.

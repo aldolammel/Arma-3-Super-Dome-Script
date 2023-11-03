@@ -1,4 +1,4 @@
-# Arma 3 / SD: Super Dome v1.2
+# Arma 3 / SD: Super Dome v1.5
 >*Dependencies: none.*
 
 SD is an Arma 3 script that's a smart protection against damage for players, vehicles and AI units when them are within editable zones. The protected zones have automatic removal of wrecks and overturned vehicles, in addition to small automations relating to the protected zones integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
@@ -36,6 +36,15 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/244082-rele
 __
 
 ## CHANGELOG
+
+**Nov, XXth 2023 | v1.5**
+- Added > xxxxxxxxxxxxxxxxx;
+- Added > xxxxxxxxxxxxxxxx;
+- Improved > xxxxxxxxxxxxxxxxx;
+- Fixed > xxxxxxxxxxxxxxxxxx;
+- Improved > xxxxxxxxxxxxxx;
+- Improved > xxxxxxxxxxxxxxxx;
+- Documentation has been updated.
 
 **Nov, 3rd 2023 | v1.2**
 - Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
