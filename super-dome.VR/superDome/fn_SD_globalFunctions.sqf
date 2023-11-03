@@ -26,64 +26,131 @@ THY_fnc_SD_vehicle_autoRemoval = {
 	// This function is ............
 	// Returns nothing.
 
-	params ["_mkrInfo", "_veh", "_crew"];
-	private ["_timeout", "_mkr", "_mkrPos", "_rng", "_vehs"];
+	params ["_veh", "_rng", "_zonePos"];
+	private ["_crew", "_tol", "_timeout"];
 
+	// Take the current crew:
+	_crew = crew _veh;
+	// Wait to see if the veh not just rolled over once before return to a regular position:
+	sleep 5;
 	// Escape:
-		// Reserved space;
+	if ( (vectorUp _veh # 2) >= SD_leanLimit ) exitWith {};
 	// Initial values:
-		// Reserved space;
-	// If more than one veh is running this function, this waitUntil force the others to wait:
-	waitUntil { sleep 5; !SD_isRemoving };
-	// Remove it temporally of the valid vehs to check, and avoid a crazy looping for this vehicle in specific:
-	(_mkrInfo # 3) deleteAt ((_mkrInfo # 3) find _veh);
-	// Updating the global variable:
-	publicVariable "SD_zonesCollection";
+	_tol = 0;
+	// Timeout calc - the time's cutted in a half if no crew:
+	if (count _crew > 0) then { 
+		_tol = SD_vehDelTolerance;
+		// Player message (Mandatory):
+		[format ["%1 %2 secs left to turn over the equipment before its auto-removal!", SD_alertHeader, _tol]] remoteExec ["systemChat", _crew];
+	} else {
+		_tol = (SD_vehDelTolerance / 2);
+		// Debug message:
+		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _veh] };
+	};  
 	// Declarations:
-	_timeout      = time + SD_vehDelTolerance;
-	_mkr          = _mkrInfo # 0;
-	_mkrPos       = getMarkerPos _mkr;
-	_rng          = _mkrInfo # 1;
-	_vehs         = _mkrInfo # 3;
-	SD_isRemoving = true;  // Flagging for other issued vehicles doenst require the auto-removal at the same time.
-	publicVariable "SD_isRemoving";
-	// Debug message:
-	if SD_isOnDebugGlobal then { systemChat format ["%1 '%2' vehs-list updated: %3 veh(s)/static weapon(s).", SD_debugHeader, toUpper _mkr, count _vehs]; sleep 2};
-	// Player message (Mandatory):
-	[format ["%1 %2 secs to fix the vehicle position before its auto-removal.", SD_alertHeader, SD_vehDelTolerance]] remoteExec ["systemChat", _crew];
+	_timeout = time + _tol;
 	// Waiting until the timeout runs, or veh pos be fixed, or veh explode, or be moved to out of zone:
-	waitUntil { sleep 10; time > _timeout || (vectorUp _veh # 2) > SD_vehLeaning || !alive _veh || _veh distance _mkrPos > _rng };
-	// If somehow the veh gets out of protected zone, restoring its regular condition:
-	if ( _veh distance _mkrPos > _rng ) then { _veh allowDamage true } else { sleep 10 /* at zone, wait to see if the veh won't flip again */};
+	waitUntil { sleep 10; time > _timeout || (vectorUp _veh # 2) >= SD_leanLimit || !alive _veh || _veh distance _zonePos > _rng };
+	// If somehow the veh gets out of zone, restoring its regular condition:
+	if ( _veh distance _zonePos > _rng ) then { _veh allowDamage true } else { sleep 5 /* at zone, wait to see if the veh won't roll over again */};
 	// If veh still alive (Zeus can force a explosion or throw the veh out of zone), and restore to regular position:
 	if ( alive _veh ) then {
-		// If veh pos is fixed:
-		if ( (vectorUp _veh # 2) > SD_vehLeaning ) then {
-			// Restore the veh:
-			_vehs pushBack _veh;
-			// Update the global var:
-			publicVariable "SD_zonesCollection";
-			// Send the message to the crew members (Mandatory):
+		// If the regular veh pos is recovered:
+		if ( (vectorUp _veh # 2) >= SD_leanLimit ) then {
+			// Message to the crew (Mandatory):
 			[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
 		// If veh still in a bad pos:
 		} else {
 			// Force the current crew (alive or unconscious) to leave the vehicle:
 			{ moveOut _x } forEach crew _veh;  // "crew _veh" will check only the current units inside the veh. Don't use _crew here!
-			// Animation breath:
-			sleep 1;
 			// Delete the veh:
 			deleteVehicle _veh;
+			// Debug message:
+			if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been deleted.", SD_warningHeader, typeOf _veh] call BIS_fnc_error };
 		};
 	// If somehow the veh blew up:
 	} else {
+		// Message to the crew (Mandatory):
+		[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
 		// Delete the wreck, if inside the zone:
-		if ( _veh distance _mkrPos > _rng ) then { deleteVehicle _veh };
+		if ( _veh distance _zonePos > _rng ) then { deleteVehicle _veh };
 	};
-	// Debug message:
-	if SD_isOnDebugGlobal then { systemChat format ["%1 '%2' vehs-list updated: %3 veh(s)/static weapon(s).", SD_debugHeader, toUpper _mkr, count (_mkrInfo # 3)] };
-	// Flagging that the function has been finished:
-	SD_isRemoving = false;
-	publicVariable "SD_isRemoving";
+	// Return:
+	true;
+};
+
+
+THY_fnc_SD_protection_vehicle = {
+	// This function ...
+	// Returns nothing.
+
+	params ["_veh", "_rng", "_zonePos"];
+	//private ["", "", ""];
+
+	// Escape:
+		// Reserved space;
+	// Initial values:
+		// Reserved space;
+	// Declarations:
+		// Reserved space;
+	// If veh still in-game:
+	while { alive _veh } do {
+		// if inside the protection range:
+		if ( _veh distance _zonePos <= _rng ) then {
+			// if inside the speed limit:
+			if ( abs (speed _veh) <= SD_speedLimit ) then {
+				// Makes vehicle unbreakable:
+				if ( isDamageAllowed _veh ) then { _veh allowDamage false };
+				// If veh pos is NOT ok:
+				if ( (vectorUp _veh # 2) < SD_leanLimit ) then {
+					[_veh, _rng, _zonePos] call THY_fnc_SD_vehicle_autoRemoval;
+					// Escape:
+					if ( !alive _veh ) exitWith {};
+				};
+			};
+		// Otherwise:
+		} else {
+			// Restores veh condition:
+			if ( !(isDamageAllowed _veh) ) then { _veh allowDamage true };
+		};
+		// CPU breath:
+		sleep (1.5 * SD_checkDelay);
+	};
+	// Return:
+	true;
+};
+
+
+THY_fnc_SD_protection_aiUnits = {
+	// This function ...
+	// Returns nothing.
+
+	params ["_ai", "_mkr", "_rng", "_zonePos"];
+	//private ["", "", ""];
+
+	// Escape:
+	if !SD_isProtectedAI exitWith {};
+	// Initial values:
+		// Reserved space;
+	// Declarations:
+		// Reserved space;
+	// Main function:
+	
+					// If AI unit (_ai) is alive and inside the protected zone:
+					if ( alive _ai && _ai distance _mkrPos <= _rng ) then {
+						// Makes the unit immortal:
+						_ai allowDamage false;
+						//
+					// Otherwise:
+					} else {
+						// Restores the unit condition:
+						_ai allowDamage true;
+					};
+					// Breath:
+					sleep 0.1;
+
+
+
 	// Return:
 	true;
 };

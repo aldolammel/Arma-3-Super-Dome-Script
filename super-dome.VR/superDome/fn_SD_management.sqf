@@ -19,7 +19,7 @@ if !isServer exitWith {};
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
 			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons that spawn inside / false = doesnt protect. Default: true.
-			SD_isProtectedAI      = true;   // WIP // true = zones protect all AI units inside / false = doesnt protect. Default: false.
+			SD_isProtectedAI      = false;   // WIP // true = zones protect all AI units inside / false = doesnt protect. Default: false.
 			// Customs:
 			SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
 			SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
@@ -71,12 +71,14 @@ if !isServer exitWith {};
 		// ADVANCED:
 		// Be careful even more here:
 
-			// In seconds, time before the next protection check:
+			// In seconds, time before the next protection check for players, vehicles/static weapons, and AI units:
 			SD_checkDelay      = 3;  // Default 3.
 			// In seconds, how much time players got to fix vehicle position before it been deleted when it get upside-down in a protected zone:
-			SD_vehDelTolerance = 60;  // Default 60.
+			SD_vehDelTolerance = 30;  // Default 30.
 			// Which types of vehicles the SD should scan if SD_isProtectedVehicle is true:
 			SD_scanVehTypes    = ["Car", "Tank", "Plane", "Submarine", "Helicopter", "Motocycle", "Ship", "StaticWeapon"];
+			// In seconds, how much time the script must wait before to go into its functions right after the mission gets started:
+			SD_wait            = 1; // Default 1;
 
 
 	// DONT TOUCH //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +87,7 @@ if !isServer exitWith {};
 	// Declarations - part 1/2:
 	SD_debugHeader = toUpper "SD DEBUG >";
 	// Declaring the global variables - part 1/2:
-	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_isOnAlerts"; publicVariable "SD_checkDelay"; publicVariable "SD_debugHeader";
+	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_isOnAlerts"; publicVariable "SD_debugHeader";
 	// Escape:
 	if ( !SD_isOnSuperDome || { !SD_isProtectedPlayer && !SD_isProtectedVehicle && !SD_isProtectedAI } ) exitWith { if SD_isOnDebugGlobal then { systemChat format ["%1 Super-Dome was shut down by the mission editor!", SD_debugHeader] } };
 	// Initial values:
@@ -96,8 +98,7 @@ if !isServer exitWith {};
 	SD_warningHeader = toUpper "SD WARNING >";
 	SD_alertHeader   = toUpper "SUPERDOME INFO >";
 	SD_speedLimit    = 30;
-	SD_vehLeaning    = 0.5;
-	SD_isRemoving    = false;
+	SD_leanLimit     = 0.5;
 	// Building the array structure for further steps:
 	_zones = [
 		[_protectedMkr01, _mkrDisRange01, _mkrSide01, nil, nil],  // nil1 = [vehs classnames further], nil2 = [ai groups further]
@@ -164,9 +165,11 @@ if !isServer exitWith {};
 	// Debug message:
 	if SD_isOnDebugGlobal then { systemChat format ["%1 Found %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
 	// Mission editor other warnings:
-	if (SD_checkDelay < 2) then {systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warningHeader, SD_checkDelay]}; if (SD_checkDelay > 5) then {systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warningHeader, SD_checkDelay]}; if ( SD_speedLimit isNotEqualTo 30 ) then {systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warningHeader]};
+	if ( SD_checkDelay < 2 ) then { systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warningHeader, SD_checkDelay] }; if ( SD_checkDelay > 5 ) then { systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warningHeader, SD_checkDelay] }; if ( SD_speedLimit isNotEqualTo 30 ) then { systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warningHeader] };
+	// Errors handling:
+	if ( SD_wait < 1 ) then { SD_wait = 1; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_wait' value CANNOT be less than 1. The value was fixed to the minimum.", SD_debugHeader] } }; if ( SD_vehDelTolerance < 10 ) then { SD_vehDelTolerance = 10; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_vehDelTolerance' value CANNOT be less than 10. The value was fixed to the minimum.", SD_debugHeader] } };
 	// Declaring the global variables - part 2/2:
-	publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_vehLeaning"; publicVariable "SD_isRemoving"; publicVariable "SD_scanVehTypes"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus";
+	publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait";
 };
 // return:
 true;

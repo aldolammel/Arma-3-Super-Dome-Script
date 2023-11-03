@@ -53,7 +53,7 @@ if SD_isOnDebugGlobal then {
 	systemChat format ["%1 Your side (%2) has %3 protected zones.", SD_debugHeader, playerSide, count _sideZones];
 };
 // Wait for the _unit be alive on the map:
-waitUntil { sleep 1; !isNull _unit };
+waitUntil { sleep 0.5; time > SD_wait && !isNull _unit };
 // Debug:
 if SD_isOnDebugGlobal then {
 	// Shows the SD monitor:
@@ -61,18 +61,11 @@ if SD_isOnDebugGlobal then {
 };
 // Looping to check the protected zones:
 while { SD_isProtectedPlayer && alive _unit } do {
-	
-	systemChat format ["Reservado em: %1", _zoneBooked];
-	
 	{  // forEach _sideZones:
 		// Internal Declarations:
 		_zone    = _x # 0;
 		_zonePos = getMarkerPos _zone;
 		_rng     = _x # 1;
-
-
-		systemChat format ["Checking zone: %1", _zone];
-
 		// If this zone-marker is NOT already booked:
 		if ( _zone isNotEqualTo _zoneBooked ) then {
 			// if _unit is into the base range, respecting the speed limit:
@@ -81,11 +74,6 @@ while { SD_isProtectedPlayer && alive _unit } do {
 				_unit allowDamage false;
 				// It does the booking:
 				_zoneBooked = _zone;
-
-				systemChat str (isDamageAllowed _unit);
-				systemChat "Nova reserva! (false = imortal)";
-				
-
 				// Message:
 				if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
 					systemChat format ["%1 You're in a protected zone%2.",
