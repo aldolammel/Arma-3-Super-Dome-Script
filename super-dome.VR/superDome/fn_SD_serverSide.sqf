@@ -11,18 +11,19 @@ if !isServer exitWith {};
 	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
 	
 	//params [""];
-	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_zonesBySide", "_zonesNum"];
+	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_zonesToSelect", "_zonesBySide", "_zonesNum"];
 
 	// Initial values:
-	_zoneInfo = [];
-	_mkr      = ""; 
-	_rng      = 0;
-	_side     = nil;
-	_vehs     = [];
-	_aiUnits  = [];
-	_zonePos  = [];
-	_result   = [];
-	_zonesBySide = [[/* 0=blu */],[/* 1=opf */],[/* 2=ind */],[/* 3=civ */]];
+	_zoneInfo      = [];
+	_mkr           = ""; 
+	_rng           = 0;
+	_side          = nil;
+	_vehs          = [];
+	_aiUnits       = [];
+	_zonePos       = [];
+	_result        = [];
+	_zonesToSelect = [[/* 0=blu */],[/* 1=opf */],[/* 2=ind */],[/* 3=civ */]];
+	_zonesBySide   = [];
 	// Declarations:
 	SD_serverSideStatus = "ON";
 	publicVariable "SD_serverSideStatus";
@@ -89,10 +90,10 @@ if !isServer exitWith {};
 
 		// SCAN > ZONES COLLECTION BY SIDE:
 		switch _side do {
-			case BLUFOR:      { (_zonesBySide # 0) pushBack [_mkr, _rng, _zonePos] };
-			case OPFOR:       { (_zonesBySide # 1) pushBack [_mkr, _rng, _zonePos] };
-			case INDEPENDENT: { (_zonesBySide # 2) pushBack [_mkr, _rng, _zonePos] };
-			case CIVILIAN:    { (_zonesBySide # 3) pushBack [_mkr, _rng, _zonePos] };
+			case BLUFOR:      { (_zonesToSelect # 0) pushBack [_mkr, _rng, _zonePos] };
+			case OPFOR:       { (_zonesToSelect # 1) pushBack [_mkr, _rng, _zonePos] };
+			case INDEPENDENT: { (_zonesToSelect # 2) pushBack [_mkr, _rng, _zonePos] };
+			case CIVILIAN:    { (_zonesToSelect # 3) pushBack [_mkr, _rng, _zonePos] };
 		};
 
 		// Debug:
@@ -117,16 +118,15 @@ if !isServer exitWith {};
 	for "_i" from 0 to _zonesNum do {
 		// Internal declarations:
 		_zoneInfo = SD_zonesCollection # _i;
-		_mkr      = _zoneInfo # 0;
-		_rng      = _zoneInfo # 1;
+		//_rng      = _zoneInfo # 1;
 		_side     = _zoneInfo # 2;
-		_zonePos  = getMarkerPos _mkr;
+		//_zonePos  = getMarkerPos _mkr;
 		// Selecting the right side's zones:
 		switch _side do {
-			case BLUFOR:      { _zonesBySide = _zonesBySide # 0 };
-			case OPFOR:       { _zonesBySide = _zonesBySide # 1 };
-			case INDEPENDENT: { _zonesBySide = _zonesBySide # 2 };
-			case CIVILIAN:    { _zonesBySide = _zonesBySide # 3 };
+			case BLUFOR:      { _zonesBySide = _zonesToSelect # 0 };
+			case OPFOR:       { _zonesBySide = _zonesToSelect # 1 };
+			case INDEPENDENT: { _zonesBySide = _zonesToSelect # 2 };
+			case CIVILIAN:    { _zonesBySide = _zonesToSelect # 3 };
 		};
 		// If protection for equipments is available:
 		if SD_isProtectedVehicle then {
