@@ -19,7 +19,7 @@ if !isServer exitWith {};
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
 			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons that spawn inside / false = doesnt protect. Default: true.
-			SD_isProtectedAI      = false;   // WIP // true = zones protect all AI units inside / false = doesnt protect. Default: false.
+			SD_isProtectedAI      = true;   // true = zones protect all AI units inside / false = doesnt protect. Default: false.
 			// Customs:
 			SD_isOnShowMarkers    = true;    // true = Show the zones only for players of the same side / false = hide them. Default: true.
 			SD_isOnAlerts         = true;    // true = player got text alerts when protected and not protected. Default: true.
@@ -95,7 +95,7 @@ if !isServer exitWith {};
 	SD_serverSideStatus = "OFF";
 	SD_clientSideStatus = "OFF";
 	// Declarations - part 2/2:
-	SD_warningHeader = toUpper "SD WARNING >";
+	SD_warnHeader = toUpper "SD WARNING >";
 	SD_alertHeader   = toUpper "SUPERDOME INFO >";
 	SD_speedLimit    = 30;
 	SD_leanLimit     = 0.5;
@@ -128,7 +128,7 @@ if !isServer exitWith {};
 					} else {
 						// Warning message:
 						systemChat format ["%1 '%2' protected zone has an INVALID SIDE. Use only BLUFOR, OPFOR, INDEPENDENT, or CIVILIAN. Fix it in 'fn_SD_management.sqf' file.",
-						SD_warningHeader, toUpper (_x # 0)];
+						SD_warnHeader, toUpper (_x # 0)];
 						// Change the marker name:
 						(_x # 0) setMarkerText " ERROR: invalid side!";
 					};
@@ -136,7 +136,7 @@ if !isServer exitWith {};
 				} else {
 					// Warning message:
 					systemChat format ["%1 '%2' protected zone has its protection RANGE LESS THAN 50m. Fix it in 'fn_SD_management.sqf' file.",
-					SD_warningHeader, toUpper (_x # 0)];
+					SD_warnHeader, toUpper (_x # 0)];
 					// Change the marker name:
 					(_x # 0) setMarkerText " ERROR: low range!";
 				};
@@ -144,7 +144,7 @@ if !isServer exitWith {};
 			} else {
 				// Warning message:
 				systemChat format ["%1 '%2' protected zone has an INVALID SHAPE TYPE. On Eden, use only marker types to set your protected zone positions.",
-				SD_warningHeader, toUpper (_x # 0)];
+				SD_warnHeader, toUpper (_x # 0)];
 			};
 		};
 	} forEach _zones;
@@ -165,11 +165,11 @@ if !isServer exitWith {};
 	// Debug message:
 	if SD_isOnDebugGlobal then { systemChat format ["%1 Found %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
 	// Mission editor other warnings:
-	if ( SD_checkDelay < 2 ) then { systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warningHeader, SD_checkDelay] }; if ( SD_checkDelay > 5 ) then { systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warningHeader, SD_checkDelay] }; if ( SD_speedLimit isNotEqualTo 30 ) then { systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warningHeader] };
+	if ( SD_checkDelay < 2 ) then { systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warnHeader, SD_checkDelay] }; if ( SD_checkDelay > 5 ) then { systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warnHeader, SD_checkDelay] }; if ( SD_speedLimit isNotEqualTo 30 ) then { systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warnHeader] };
 	// Errors handling:
 	if ( SD_wait < 1 ) then { SD_wait = 1; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_wait' value CANNOT be less than 1. The value was fixed to the minimum.", SD_debugHeader] } }; if ( SD_vehDelTolerance < 10 ) then { SD_vehDelTolerance = 10; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_vehDelTolerance' value CANNOT be less than 10. The value was fixed to the minimum.", SD_debugHeader] } };
 	// Declaring the global variables - part 2/2:
-	publicVariable "SD_warningHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait";
+	publicVariable "SD_warnHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait";
 };
 // return:
 true;

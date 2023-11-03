@@ -11,7 +11,7 @@ if !isServer exitWith {};
 	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
 	
 	//params [""];
-	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_crew", "_zonesNum"];
+	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_zonesBySide", "_zonesNum"];
 
 	// Initial values:
 	_zoneInfo = [];
@@ -22,7 +22,7 @@ if !isServer exitWith {};
 	_aiUnits  = [];
 	_zonePos  = [];
 	_result   = [];
-	_crew     = [];
+	_zonesBySide = [[/* 0=blu */],[/* 1=opf */],[/* 2=ind */],[/* 3=civ */]];
 	// Declarations:
 	SD_serverSideStatus = "ON";
 	publicVariable "SD_serverSideStatus";
@@ -64,7 +64,7 @@ if !isServer exitWith {};
 			// Adding to Zeus when debugging:
 			if ( SD_isOnDebugGlobal && SD_isOnZeusWhenDebug ) then { { _x addCuratorEditableObjects [_result, true]; sleep 0.1 } forEach allCurators };
 			// CPU breath:
-			sleep 0.5;
+			sleep 0.25;
 		// Otherwise:
 		} else {
 			// Change index-value from nil to array (empty):
@@ -80,27 +80,35 @@ if !isServer exitWith {};
 			// Adding to Zeus when debugging:
 			if ( SD_isOnDebugGlobal && SD_isOnZeusWhenDebug ) then { { _x addCuratorEditableObjects [_result, true]; sleep 0.1 } forEach allCurators };
 			// CPU breath:
-			sleep 0.5;
+			sleep 0.25;
 		// Otherwise:
 		} else {
 			// Change index-value from nil to array (empty):
 			_zoneInfo set [4, []];
 		};
 
-		// Internal Declarations - part2/2:
-		_vehs    = _zoneInfo # 3;
-		_aiUnits = _zoneInfo # 4;
+		// SCAN > ZONES COLLECTION BY SIDE:
+		switch _side do {
+			case BLUFOR:      { (_zonesBySide # 0) pushBack [_mkr, _rng, _zonePos] };
+			case OPFOR:       { (_zonesBySide # 1) pushBack [_mkr, _rng, _zonePos] };
+			case INDEPENDENT: { (_zonesBySide # 2) pushBack [_mkr, _rng, _zonePos] };
+			case CIVILIAN:    { (_zonesBySide # 3) pushBack [_mkr, _rng, _zonePos] };
+		};
+
 		// Debug:
 		if SD_isOnDebugGlobal then {
+			// Internal Declarations - part2/2:
+			_vehs    = _zoneInfo # 3;
+			_aiUnits = _zoneInfo # 4;
 			// Message:
-			systemChat format ["%1 %2 '%3' zone has %4 veh(s)/staticWeapon(s) and %5 AI unit(s) protected.",
+			systemChat format ["%1 %2 '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
 			SD_debugHeader, str _side, toUpper _mkr, if (count _vehs > 0) then {count _vehs} else {0}, if (count _aiUnits > 0) then {count _aiUnits} else {0}];
 			// Message breath:
 			sleep 3;
 		};
 		// Additional CPU breath:
 		sleep 1;
-	};
+	};  // For-loop ends.
 	// Updating the global variable:
 	publicVariable "SD_zonesCollection";
 
@@ -111,25 +119,25 @@ if !isServer exitWith {};
 		_zoneInfo = SD_zonesCollection # _i;
 		_mkr      = _zoneInfo # 0;
 		_rng      = _zoneInfo # 1;
+		_side     = _zoneInfo # 2;
 		_zonePos  = getMarkerPos _mkr;
 		// If protection for equipments is available:
 		if SD_isProtectedVehicle then {
 			// Internal declarations:
 			_vehs = _zoneInfo # 3;
 			// Start a new thread for each vehicle must be protected:
-			{ [_x, _rng, _zonePos] spawn THY_fnc_SD_protection_vehicle; sleep 0.1 } forEach _vehs;
+			{ [_side, _x, _zonesBySide] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehs;
 		};
 		// If protection for AI is available:
 		if SD_isProtectedAI then {
 			// Internal declarations:
-			//_side    = _zoneInfo # 2;
 			_aiUnits = _zoneInfo # 4;
 			// Start a new thread for each AI must be protected:
-			{ [_x, _rng, _zonePos] spawn THY_fnc_SD_protection_aiUnits; sleep 0.1 } forEach _aiUnits;
+			{ [_side, _x, _zonesBySide] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnits;
 		};
 		// CPU breath:
 		sleep 1;
-	};
+	};  // For-loop ends.
 };	// Spawn ends.
 // Return:
 true;

@@ -10,15 +10,15 @@ if !hasInterface exitWith {};
 if ( !SD_isOnSuperDome || !SD_isProtectedPlayer ) exitWith {};
 
 params ["_unit"];
-private ["_zone", "_zonePos", "_rng", "_zoneBooked", "_sideZones", "_debugMkr"];
+private ["_zone", "_zonePos", "_zoneBooked", "_rng", "_rngMkr", "_sideZones"];
 
 // Initial values:
 _zone       = objNull;
 _zonePos    = [];
-_rng        = nil; 
 _zoneBooked = "";
+_rng        = 0;
+_rngMkr     = "";
 _sideZones  = [];
-_debugMkr   = "";
 // Declarations:
 SD_clientSideStatus = "ON";
 publicVariable "SD_clientSideStatus";
@@ -36,13 +36,13 @@ publicVariable "SD_clientSideStatus";
 			// Marker position visible:
 			_zone setMarkerAlpha 1;
 			// Set an uncommitted visible protection range:
-			_debugMkr = createMarker ["SD_RANGE_"+_zone, getMarkerPos _zone];
-			_debugMkr setMarkerShape "ELLIPSE";
-			_debugMkr setMarkerSize [_rng, _rng];
-			_debugMkr setMarkerBrush "Border";
-			_debugMkr setMarkerColor "ColorWhite";
-			_debugMkr setMarkerAlpha 1;
-			//_debugMkr setMarkerDrawPriority 1;  // WIP
+			_rngMkr = createMarker ["SD_RANGE_"+_zone, getMarkerPos _zone];
+			_rngMkr setMarkerShape "ELLIPSE";
+			_rngMkr setMarkerSize [_rng, _rng];
+			_rngMkr setMarkerBrush "Border";
+			_rngMkr setMarkerColor "ColorWhite";
+			_rngMkr setMarkerAlpha 1;
+			//_rngMkr setMarkerDrawPriority 1;  // WIP
 		};
 	};
 } forEach SD_zonesCollection;
@@ -60,7 +60,7 @@ if SD_isOnDebugGlobal then {
 	[_unit] spawn THY_fnc_SD_debugMonitor;
 };
 // Looping to check the protected zones:
-while { SD_isProtectedPlayer && alive _unit } do {
+while { alive _unit } do {
 	{  // forEach _sideZones:
 		// Internal Declarations:
 		_zone    = _x # 0;
