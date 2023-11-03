@@ -121,19 +121,26 @@ if !isServer exitWith {};
 		_rng      = _zoneInfo # 1;
 		_side     = _zoneInfo # 2;
 		_zonePos  = getMarkerPos _mkr;
+		// Selecting the right side's zones:
+		switch _side do {
+			case BLUFOR:      { _zonesBySide = _zonesBySide # 0 };
+			case OPFOR:       { _zonesBySide = _zonesBySide # 1 };
+			case INDEPENDENT: { _zonesBySide = _zonesBySide # 2 };
+			case CIVILIAN:    { _zonesBySide = _zonesBySide # 3 };
+		};
 		// If protection for equipments is available:
 		if SD_isProtectedVehicle then {
 			// Internal declarations:
 			_vehs = _zoneInfo # 3;
 			// Start a new thread for each vehicle must be protected:
-			{ [_side, _x, _zonesBySide] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehs;
+			{ [_x, _zonesBySide] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehs;
 		};
 		// If protection for AI is available:
 		if SD_isProtectedAI then {
 			// Internal declarations:
 			_aiUnits = _zoneInfo # 4;
 			// Start a new thread for each AI must be protected:
-			{ [_side, _x, _zonesBySide] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnits;
+			{ [_x, _zonesBySide] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnits;
 		};
 		// CPU breath:
 		sleep 1;

@@ -37,12 +37,15 @@ THY_fnc_SD_equipment_autoRemoval = {
 	if ( (vectorUp _veh # 2) >= SD_leanLimit ) exitWith {};
 	// Initial values:
 	_tol = 0;
-	// Timeout calc - the time's cutted in a half if no crew:
+	// If there's crew:
 	if (count _crew > 0) then { 
+		// Editor choice:
 		_tol = SD_vehDelTolerance;
 		// Player message (Mandatory):
 		[format ["%1 %2 secs left to turn over the equipment before its auto-removal!", SD_warnHeader, _tol]] remoteExec ["systemChat", _crew];
+	// If there is NO crew:
 	} else {
+		// Timeout is cutted by half:
 		_tol = (SD_vehDelTolerance / 2);
 		// Debug message:
 		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _veh] };
@@ -50,31 +53,36 @@ THY_fnc_SD_equipment_autoRemoval = {
 	// Declarations:
 	_timeout = time + _tol;
 	// Waiting until the timeout runs, or veh pos be fixed, or veh explode, or be moved to out of zone:
-	waitUntil { sleep 10; time > _timeout || (vectorUp _veh # 2) >= SD_leanLimit || !alive _veh || _veh distance _zonePos > _rng };
-	// If somehow the veh gets out of zone, restoring its regular condition:
-	if ( _veh distance _zonePos > _rng ) then { _veh allowDamage true } else { sleep 5 /* at zone, wait to see if the veh won't roll over again */};
-	// If veh still alive (Zeus can force a explosion or throw the veh out of zone), and restore to regular position:
+	waitUntil { sleep 5; time > _timeout || (vectorUp _veh # 2) >= SD_leanLimit || !alive _veh || _veh distance _zonePos > _rng };
+	// If veh still alive (Zeus can force a explosion or throw the veh out of zone):
 	if ( alive _veh ) then {
-		// If the regular veh pos is recovered:
-		if ( (vectorUp _veh # 2) >= SD_leanLimit ) then {
-			// If there's crew:
-			if (count _crew > 0) then {
-				// Message to the crew (Mandatory):
-				[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
-			} else {
-				// Debug message:
-				if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _veh] };
-			};
-		// If veh still in a bad pos:
+		// If somehow the veh gets out of zone (helicopter out of control, for example):
+		if ( _veh distance _zonePos > _rng ) then { 
+			// Restore the veh fragility:
+			_veh allowDamage true;
+		// If still in zone:
 		} else {
-			// Force the current crew (alive or unconscious) to leave the vehicle:
-			{ moveOut _x } forEach crew _veh;  // "crew _veh" will check only the current units inside the veh. Don't use _crew here!
-			// Animation breath:
-			sleep 0.5;
-			// Delete the veh:
-			deleteVehicle _veh;
-			// Debug message:
-			if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been deleted.", SD_warnHeader, typeOf _veh] call BIS_fnc_error };
+			// If the regular veh pos is recovered:
+			if ( (vectorUp _veh # 2) >= SD_leanLimit ) then {
+				// If there's crew:
+				if (count _crew > 0) then {
+					// Message to the crew (Mandatory):
+					[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
+				} else {
+					// Debug message:
+					if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _veh] };
+				};
+			// If veh still in a bad pos:
+			} else {
+				// Force the current crew (alive or unconscious) to leave the vehicle:
+				{ moveOut _x } forEach crew _veh;  // "crew _veh" will check only the current units inside the veh. Don't use _crew here!
+				// Animation breath:
+				sleep 0.5;
+				// Delete the veh:
+				deleteVehicle _veh;
+				// Debug message:
+				if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been deleted.", SD_warnHeader, typeOf _veh] call BIS_fnc_error };
+			};
 		};
 	// If somehow the veh blew up:
 	} else {
@@ -95,10 +103,10 @@ THY_fnc_SD_equipment_autoRemoval = {
 
 
 THY_fnc_SD_protection_equipment = {
-	// This function ...
+	// This function protects only those equipments (veh and static weapons) inside all their zones.
 	// Returns nothing.
 
-	params ["_side", "_veh", "_zonesBySide"];
+	params ["_veh", "_zonesBySide"];
 	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
 
 	// Escape:
@@ -110,13 +118,6 @@ THY_fnc_SD_protection_equipment = {
 	_zoneBooked = "";
 	// Declarations:
 		// Reserved space.
-	//
-	switch _side do {
-		case BLUFOR:      { _zonesBySide = _zonesBySide # 0 };
-		case OPFOR:       { _zonesBySide = _zonesBySide # 1 };
-		case INDEPENDENT: { _zonesBySide = _zonesBySide # 2 };
-		case CIVILIAN:    { _zonesBySide = _zonesBySide # 3 };
-	};
 	// If veh still in-game:
 	while { alive _veh } do {
 		{  // forEach _zonesBySide:
@@ -168,10 +169,10 @@ THY_fnc_SD_protection_equipment = {
 
 
 THY_fnc_SD_protection_aiUnit = {
-	// This function ...
+	// This function protects only AI units inside all their zones.
 	// Returns nothing.
 
-	params ["_side", "_ai", "_zonesBySide"];
+	params ["_ai", "_zonesBySide"];
 	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
 
 	// Escape:
@@ -183,13 +184,6 @@ THY_fnc_SD_protection_aiUnit = {
 	_zoneBooked = "";
 	// Declarations:
 		// Reserved space.
-	//
-	switch _side do {
-		case BLUFOR:      { _zonesBySide = _zonesBySide # 0 };
-		case OPFOR:       { _zonesBySide = _zonesBySide # 1 };
-		case INDEPENDENT: { _zonesBySide = _zonesBySide # 2 };
-		case CIVILIAN:    { _zonesBySide = _zonesBySide # 3 };
-	};
 	// If veh still in-game:
 	while { alive _ai } do {
 		{  // forEach _zonesBySide:
