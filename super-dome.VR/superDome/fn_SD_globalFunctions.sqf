@@ -1,4 +1,4 @@
-// SUPER DOME v1.2
+// SUPER DOME v1.2.1
 // File: your_mission\superDome\fn_SD_globalFunctions.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -103,11 +103,12 @@ THY_fnc_SD_equipment_autoRemoval = {
 
 
 THY_fnc_SD_protection_equipment = {
-	// This function protects only those equipments (veh and static weapons) inside all their zones.
+	// This function protects individualy each equipment (veh or static weapon) when inside of all zones from the same side of the zone originally scanned the object in its range at the mission get started.
+	// Param: _obj: vehicle or static weapon.
 	// Returns nothing.
 
-	params ["_veh", "_zonesBySide"];
-	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
+	params ["_obj", "_zonesBySide"];
+	private ["_isRestart", "_zone", "_rng", "_zonePos", "_zoneBooked"];
 
 	// Escape:
 		// Reserved space;
@@ -116,51 +117,54 @@ THY_fnc_SD_protection_equipment = {
 	_rng        = 0;
 	_zonePos    = [];
 	_zoneBooked = "";
+	_isRestart  = false;
 	// Declarations:
 		// Reserved space.
-	// If veh still in-game:
-	while { alive _veh } do {
+	// If _obj still in-game:
+	while { alive _obj } do {
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
 			_zone    = _x # 0;
 			_rng     = _x # 1;
 			_zonePos = _x # 2;
 			// If this zone-marker is NOT already booked:
-			if ( _zone isNotEqualTo _zoneBooked ) then {
+			if ( _zone isNotEqualTo _zoneBooked || _isRestart ) then {
+				// Cleaning the flag:
+				_isRestart = false;
 				// if inside the protection range:
-				if ( _veh distance _zonePos <= _rng ) then {
-					// Makes vehicle unbreakable:
-					_veh allowDamage false;
+				if ( _obj distance _zonePos <= _rng ) then {
+					// Makes _obj unbreakable:
+					_obj allowDamage false;
 					// It does the booking:
 					_zoneBooked = _zone;
-					// wait until the veh (somehow) explodes, or get far away from zone, or roll over:
-					waitUntil { sleep SD_checkDelay; !alive _veh || _veh distance _zonePos > _rng || (vectorUp _veh # 2) < SD_leanLimit };
-					// If vehicle still alive:
-					if ( alive _veh ) then {
+					// wait until the _obj (somehow) explodes, or get far away from zone, or roll over:
+					waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng || (vectorUp _obj # 2) < SD_leanLimit };
+					// If _obj still alive:
+					if ( alive _obj ) then {
 						// still inside the zone:
-						if ( _veh distance _zonePos <= _rng ) then {
-							// If veh rolled over:
-							if ( (vectorUp _veh # 2) < SD_leanLimit ) then {
-								[_veh, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
+						if ( _obj distance _zonePos <= _rng ) then {
+							// If _obj rolled over:
+							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
+								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
+								// Flag to restart the same zone checking:
+								_isRestart = true;
 							};
 						// Otherwise, if out of zone:
 						} else {
-							// Restores the _veh original fragility:
-							_veh allowDamage true;
+							// Restores the _obj original fragility:
+							_obj allowDamage true;
 							// Undone the booking:
 							_zoneBooked = "";
 						};
-					// if vehicle is destroyed:
+					// if _obj is destroyed:
 					} else {
 						// Delete the wreck, if inside the zone:
-						if ( _veh distance _zonePos <= _rng ) then { deleteVehicle _veh };
+						if ( _obj distance _zonePos <= _rng ) then { deleteVehicle _obj };
 					};
 				};
-				// CPU breath:
-				sleep SD_checkDelay;
 			};
 			// Breath:
-			sleep 0.2;
+			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
 	// Return:
@@ -169,10 +173,11 @@ THY_fnc_SD_protection_equipment = {
 
 
 THY_fnc_SD_protection_aiUnit = {
-	// This function protects only AI units inside all their zones.
+	// This function protects individualy each AI unit when inside of all zones from the same side of the zone originally scanned the object in its range at the mission get started.
+	// Param: _obj: AI unit.
 	// Returns nothing.
 
-	params ["_ai", "_zonesBySide"];
+	params ["_obj", "_zonesBySide"];
 	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
 
 	// Escape:
@@ -185,7 +190,7 @@ THY_fnc_SD_protection_aiUnit = {
 	// Declarations:
 		// Reserved space.
 	// If veh still in-game:
-	while { alive _ai } do {
+	while { alive _obj } do {
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
 			_zone    = _x # 0;
@@ -194,26 +199,24 @@ THY_fnc_SD_protection_aiUnit = {
 			// If this zone-marker is NOT already booked:
 			if ( _zone isNotEqualTo _zoneBooked ) then {
 				// if inside the protection range:
-				if ( _ai distance _zonePos <= _rng ) then {
-					// Makes _ai immortal:
-					_ai allowDamage false;
+				if ( _obj distance _zonePos <= _rng ) then {
+					// Makes _obj immortal:
+					_obj allowDamage false;
 					// It does the booking:
 					_zoneBooked = _zone;
 					// wait until the veh (somehow) explodes, or get far away from zone, or roll over:
-					waitUntil { sleep SD_checkDelay; !alive _ai || _ai distance _zonePos > _rng };
-					// If _ai still alive:
-					if ( alive _ai && _ai distance _zonePos > _rng ) then {
-						// Restores _ai mortality:
-						_ai allowDamage true;
+					waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng };
+					// If _obj still alive:
+					if ( alive _obj && _obj distance _zonePos > _rng ) then {
+						// Restores _obj mortality:
+						_obj allowDamage true;
 						// Undone the booking:
 						_zoneBooked = "";
 					};
 				};
-				// CPU breath:
-				sleep SD_checkDelay;
 			};
 			// Breath:
-			sleep 0.2;
+			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
 	// Return:
