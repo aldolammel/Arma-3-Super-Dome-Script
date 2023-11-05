@@ -14,7 +14,7 @@ if !isServer exitWith {};
 		
 		SD_isOnSuperDome          = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
 			// Debugging:
-			SD_isOnDebugGlobal    = false;   // true = make your tests easier / false = turn it off. Default: false.
+			SD_isOnDebugGlobal    = true;   // true = make your tests easier / false = turn it off. Default: false.
 			SD_isOnZeusWhenDebug  = false;   // true = when debugging only, all protected things will be added to zeus. Default: false.
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
