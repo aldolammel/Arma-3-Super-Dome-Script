@@ -47,7 +47,7 @@ THY_fnc_SD_equipment_autoRemoval = {
 	} else {
 		// Timeout is cutted by half:
 		_tol = (SD_vehDelTolerance / 2);
-		// Debug message:
+		// Debug message for hosted server player (editor):
 		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _veh] };
 	};  
 	// Declarations:
@@ -108,7 +108,7 @@ THY_fnc_SD_protection_equipment = {
 	// Returns nothing.
 
 	params ["_obj", "_zonesBySide"];
-	private ["_isRestart", "_zone", "_rng", "_zonePos", "_zoneBooked"];
+	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
 
 	// Escape:
 		// Reserved space;
@@ -117,7 +117,6 @@ THY_fnc_SD_protection_equipment = {
 	_rng        = 0;
 	_zonePos    = [];
 	_zoneBooked = "";
-	_isRestart  = false;
 	// Declarations:
 		// Reserved space.
 	// If _obj still in-game:
@@ -127,40 +126,33 @@ THY_fnc_SD_protection_equipment = {
 			_zone    = _x # 0;
 			_rng     = _x # 1;
 			_zonePos = _x # 2;
-			// If this zone-marker is NOT already booked:
-			if ( _zone isNotEqualTo _zoneBooked || _isRestart ) then {
-				// Cleaning the flag:
-				_isRestart = false;
-				// if inside the protection range:
-				if ( _obj distance _zonePos <= _rng ) then {
-					// Makes _obj unbreakable:
-					_obj allowDamage false;
-					// It does the booking:
-					_zoneBooked = _zone;
-					// wait until the _obj (somehow) explodes, or get far away from zone, or roll over:
-					waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng || (vectorUp _obj # 2) < SD_leanLimit };
-					// If _obj still alive:
-					if ( alive _obj ) then {
-						// still inside the zone:
-						if ( _obj distance _zonePos <= _rng ) then {
-							// If _obj rolled over:
-							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
-								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
-								// Flag to restart the same zone checking:
-								_isRestart = true;
-							};
-						// Otherwise, if out of zone:
-						} else {
-							// Restores the _obj original fragility:
-							_obj allowDamage true;
-							// Undone the booking:
-							_zoneBooked = "";
+			// if inside the protection range:
+			if ( _obj distance _zonePos <= _rng ) then {
+				// It does the booking:
+				_zoneBooked = _zone;
+				// Makes _obj unbreakable:
+				_obj allowDamage false;
+				// wait until the _obj (somehow) explodes, or get far away from zone, or roll over:
+				waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng || (vectorUp _obj # 2) < SD_leanLimit };
+				// If _obj still alive:
+				if ( alive _obj ) then {
+					// still inside the zone:
+					if ( _obj distance _zonePos <= _rng ) then {
+						// If _obj rolled over:
+						if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
+							[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
 						};
-					// if _obj is destroyed:
+					// Otherwise, if out of zone:
 					} else {
-						// Delete the wreck, if inside the zone:
-						if ( _obj distance _zonePos <= _rng ) then { deleteVehicle _obj };
+						// Restores the _obj original fragility:
+						_obj allowDamage true;
+						// Undone the booking:
+						_zoneBooked = "";
 					};
+				// if _obj is destroyed:
+				} else {
+					// Delete the wreck, if inside the zone:
+					if ( _obj distance _zonePos <= _rng ) then { deleteVehicle _obj };
 				};
 			};
 			// Breath:
