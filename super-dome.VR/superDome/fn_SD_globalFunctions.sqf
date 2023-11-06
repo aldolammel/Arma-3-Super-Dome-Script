@@ -31,7 +31,7 @@ THY_fnc_SD_equipment_autoRemoval = {
 
 	// Take the current crew:
 	_crew = crew _veh;
-	// Wait to see if the veh not just rolled over once before return to a regular position:
+	// Wait to see if the veh not just rollovered once before return to a regular position:
 	sleep 5;
 	// Escape:
 	if ( (vectorUp _veh # 2) >= SD_leanLimit ) exitWith {};
@@ -108,7 +108,7 @@ THY_fnc_SD_protection_equipment = {
 	// Returns nothing.
 
 	params ["_obj", "_zonesBySide"];
-	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
+	private ["_zone", "_rng", "_zonePos"];
 
 	// Escape:
 		// Reserved space;
@@ -116,7 +116,6 @@ THY_fnc_SD_protection_equipment = {
 	_zone       = "";
 	_rng        = 0;
 	_zonePos    = [];
-	_zoneBooked = "";
 	// Declarations:
 		// Reserved space.
 	// If _obj still in-game:
@@ -128,17 +127,15 @@ THY_fnc_SD_protection_equipment = {
 			_zonePos = _x # 2;
 			// if inside the protection range:
 			if ( _obj distance _zonePos <= _rng ) then {
-				// It does the booking:
-				_zoneBooked = _zone;
 				// Makes _obj unbreakable:
 				_obj allowDamage false;
-				// wait until the _obj (somehow) explodes, or get far away from zone, or roll over:
+				// wait until the _obj (somehow) explodes, or get far away from zone, or rollover:
 				waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng || (vectorUp _obj # 2) < SD_leanLimit };
 				// If _obj still alive:
 				if ( alive _obj ) then {
 					// still inside the zone:
 					if ( _obj distance _zonePos <= _rng ) then {
-						// If _obj rolled over:
+						// If _obj rollovered:
 						if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
 							[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
 						};
@@ -146,8 +143,6 @@ THY_fnc_SD_protection_equipment = {
 					} else {
 						// Restores the _obj original fragility:
 						_obj allowDamage true;
-						// Undone the booking:
-						_zoneBooked = "";
 					};
 				// if _obj is destroyed:
 				} else {
@@ -170,7 +165,7 @@ THY_fnc_SD_protection_aiUnit = {
 	// Returns nothing.
 
 	params ["_obj", "_zonesBySide"];
-	private ["_zone", "_rng", "_zonePos", "_zoneBooked"];
+	private ["_zone", "_rng", "_zonePos"];
 
 	// Escape:
 		// Reserved space;
@@ -178,7 +173,6 @@ THY_fnc_SD_protection_aiUnit = {
 	_zone       = "";
 	_rng        = 0;
 	_zonePos    = [];
-	_zoneBooked = "";
 	// Declarations:
 		// Reserved space.
 	// If veh still in-game:
@@ -188,23 +182,16 @@ THY_fnc_SD_protection_aiUnit = {
 			_zone    = _x # 0;
 			_rng     = _x # 1;
 			_zonePos = _x # 2;
-			// If this zone-marker is NOT already booked:
-			if ( _zone isNotEqualTo _zoneBooked ) then {
-				// if inside the protection range:
-				if ( _obj distance _zonePos <= _rng ) then {
-					// Makes _obj immortal:
-					_obj allowDamage false;
-					// It does the booking:
-					_zoneBooked = _zone;
-					// wait until the veh (somehow) explodes, or get far away from zone, or roll over:
-					waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng };
-					// If _obj still alive:
-					if ( alive _obj && _obj distance _zonePos > _rng ) then {
-						// Restores _obj mortality:
-						_obj allowDamage true;
-						// Undone the booking:
-						_zoneBooked = "";
-					};
+			// if inside the protection range:
+			if ( _obj distance _zonePos <= _rng ) then {
+				// Makes _obj immortal:
+				_obj allowDamage false;
+				// wait until the veh (somehow) explodes, or get far away from zone, or rollover:
+				waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng };
+				// If _obj still alive:
+				if ( alive _obj && _obj distance _zonePos > _rng ) then {
+					// Restores _obj mortality:
+					_obj allowDamage true;
 				};
 			};
 			// Breath:
