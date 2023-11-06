@@ -1,4 +1,4 @@
-// SUPER DOME v1.2
+// SUPER DOME v1.2.1
 // File: your_mission\superDome\fn_SD_serverSide.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -11,7 +11,7 @@ if !isServer exitWith {};
 	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
 	
 	//params [""];
-	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_zonesAllSides", "_zonesBySide", "_zonesNum"];
+	private ["_zoneInfo", "_mkr", "_rng", "_side", "_vehs", "_aiUnits", "_zonePos", "_result", "_zonesAllSides", "_zonesBySide", "_zonesAmount"];
 
 	// Initial values:
 	_zoneInfo      = [];
@@ -27,7 +27,7 @@ if !isServer exitWith {};
 	// Declarations:
 	SD_serverSideStatus = "ON";
 	publicVariable "SD_serverSideStatus";
-	_zonesNum = count SD_zonesCollection - 1;
+	_zonesAmount = count SD_zonesCollection - 1;
 	// Debug message to everyone if client-side if OFF:
 	if ( SD_isOnDebugGlobal && !SD_isProtectedPlayer ) then {
 		[format ["%1 Server-side status: .. ON", SD_debugHeader]] remoteExec ["systemChat", 0];
@@ -48,7 +48,7 @@ if !isServer exitWith {};
 
 	// STEP 1 - SCAN
 	// Check each protected zone:
-	for "_i" from 0 to _zonesNum do {
+	for "_i" from 0 to _zonesAmount do {
 		// Internal Declarations - part 1/2:
 		_zoneInfo = SD_zonesCollection # _i;
 		_mkr     = _zoneInfo # 0;
@@ -115,12 +115,10 @@ if !isServer exitWith {};
 
 	// STEP 2 - GIVING PROTECTION:
 	// Check each zone:
-	for "_i" from 0 to _zonesNum do {
+	for "_i" from 0 to _zonesAmount do {
 		// Internal declarations:
 		_zoneInfo = SD_zonesCollection # _i;
-		//_rng      = _zoneInfo # 1;
 		_side     = _zoneInfo # 2;
-		//_zonePos  = getMarkerPos _mkr;
 		// Selecting the right side's zones:
 		switch _side do {
 			case BLUFOR:      { _zonesBySide = _zonesAllSides # 0 };
@@ -128,18 +126,18 @@ if !isServer exitWith {};
 			case INDEPENDENT: { _zonesBySide = _zonesAllSides # 2 };
 			case CIVILIAN:    { _zonesBySide = _zonesAllSides # 3 };
 		};
-		// If protection for equipments is available:
+		// If protection for equipments available:
 		if SD_isProtectedVehicle then {
 			// Internal declarations:
 			_vehs = _zoneInfo # 3;
-			// Start a new thread for each vehicle must be protected:
+			// Starts a new thread for each vehicle and static weapon that must be protected:
 			{ [_x, _zonesBySide] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehs;
 		};
-		// If protection for AI is available:
+		// If protection for AI available:
 		if SD_isProtectedAI then {
 			// Internal declarations:
 			_aiUnits = _zoneInfo # 4;
-			// Start a new thread for each AI must be protected:
+			// Starts a new thread for each AI must be protected:
 			{ [_x, _zonesBySide] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnits;
 		};
 		// CPU breath:
