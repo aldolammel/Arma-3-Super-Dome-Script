@@ -37,14 +37,10 @@ __
 
 ## CHANGELOG
 
-**Nov, XXth 2023 | v1.5**
-- XXX - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-- XXX - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-- Improved > Optimazed the way the script checks each protected thing;
-- XXX - xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
-
 **Nov, 5th 2023 | v1.2.1**
 - Fixed > When a vehicle rolled over 2 or more times inside the protected zone, the anti-rollover system stoped working properly.
+- Improved > Optimazed the way the script checks each protected thing;
+- Documentation has been updated.
 
 **Nov, 3rd 2023 | v1.2**
 - Added > When protected vehicle (unbreakable) rolls over within the protected zone, it will be deleted after a countdown if the vehicle doesn't return a functional position;
