@@ -5,7 +5,7 @@ class Header {
 	maxPlayers				= 4;
 };
 	// About
-	onLoadName 				= "SD: SUPER-DOME SCRIPT";
+	onLoadName 				= "SUPER-DOME";
 	author 					= "thy";
 	overviewPicture 		= "images\thumb.jpg";
 	onLoadMission 			= "SD is a smart script to protect players, vehicles, static weapons, and/or AI units while in specific zones.";
