@@ -95,7 +95,6 @@ if !isServer exitWith {};
 			case INDEPENDENT: { (_zonesAllSides # 2) pushBack [_mkr, _rng, _zonePos] };
 			case CIVILIAN:    { (_zonesAllSides # 3) pushBack [_mkr, _rng, _zonePos] };
 		};
-
 		// Debug:
 		if SD_isOnDebugGlobal then {
 			// Internal Declarations - part2/2:

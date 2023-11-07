@@ -33,15 +33,14 @@ publicVariable "SD_clientSideStatus";
 		// If it's to show the protected zones on the map:
 		if ( SD_isOnDebugGlobal || SD_isOnShowMarkers ) then {
 			// Marker position visible:
-			_zone setMarkerAlpha 1;
+			if SD_isOnDebugGlobal then { _zone setMarkerAlphaLocal 1 } else { _zone setMarkerAlphaLocal 0 };  // Redundancy to make sure for each player coz this is done by server-side.
 			// Set an uncommitted visible protection range:
-			_rngMkr = createMarker ["SD_RANGE_"+_zone, getMarkerPos _zone];
-			_rngMkr setMarkerShape "ELLIPSE";
-			_rngMkr setMarkerSize [_rng, _rng];
-			_rngMkr setMarkerBrush "Border";
-			_rngMkr setMarkerColor "ColorWhite";
-			_rngMkr setMarkerAlpha 1;
-			//_rngMkr setMarkerDrawPriority 1;  // WIP
+			_rngMkr = createMarkerLocal ["SD_RANGE_"+_zone, getMarkerPos _zone];
+			_rngMkr setMarkerShapeLocal "ELLIPSE";
+			_rngMkr setMarkerSizeLocal [_rng, _rng];
+			_rngMkr setMarkerBrushLocal "Border";
+			_rngMkr setMarkerColorLocal "ColorWhite";
+			_rngMkr setMarkerAlphaLocal 1;
 		};
 	};
 } forEach SD_zonesCollection;
