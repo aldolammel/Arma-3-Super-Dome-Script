@@ -33,7 +33,7 @@ publicVariable "SD_clientSideStatus";
 		// If it's to show the protected zones on the map:
 		if ( SD_isOnDebugGlobal || SD_isOnShowMarkers ) then {
 			// Marker position visible:
-			if SD_isOnDebugGlobal then { _zone setMarkerAlphaLocal 1 } else { _zone setMarkerAlphaLocal 0 };  // Redundancy to make sure for each player coz this is done by server-side.
+			if SD_isOnDebugGlobal then { _zone setMarkerAlphaLocal 1 } else { _zone setMarkerAlphaLocal 0 };  // Critical for when player changes their team.
 			// Set an uncommitted visible protection range:
 			_rngMkr = createMarkerLocal ["SD_RANGE_"+_zone, getMarkerPos _zone];
 			_rngMkr setMarkerShapeLocal "ELLIPSE";
@@ -50,7 +50,7 @@ if SD_isOnDebugGlobal then {
 	systemChat format ["%1 Client-side status: .. ON (%2)", SD_debugHeader, name _unit];
 	systemChat format ["%1 Your side (%2) has %3 protected zones.", SD_debugHeader, playerSide, count _sideZones];
 };
-// Wait for the _unit be alive on the map:
+// Wait for the _unit be alive on the map to execute the codes right after this one below:
 waitUntil { sleep 0.5; time > SD_wait && !isNull _unit };
 // Debug:
 if SD_isOnDebugGlobal then {

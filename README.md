@@ -37,16 +37,15 @@ __
 
 ## CHANGELOG
 
-**XXX, XXth 2023 | v1.5**
-- Added > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Added > xxxxxxxxxxxxxxxxxxxxxxxx;
+**Nov, XXth 2023 | v1.5**
+- Added > Support to missions with respawn-points;
 - Added > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
+- Improved > Small debug improvements;
 - Documentation has been updated.
 
 **Nov, 5th 2023 | v1.2.1**

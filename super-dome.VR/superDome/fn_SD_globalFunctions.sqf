@@ -113,9 +113,9 @@ THY_fnc_SD_protection_equipment = {
 	// Escape:
 		// Reserved space;
 	// Initial values:
-	_zone       = "";
-	_rng        = 0;
-	_zonePos    = [];
+	_zone    = "";
+	_rng     = 0;
+	_zonePos = [];
 	// Declarations:
 		// Reserved space.
 	// If _obj still in-game:
@@ -170,9 +170,9 @@ THY_fnc_SD_protection_aiUnit = {
 	// Escape:
 		// Reserved space;
 	// Initial values:
-	_zone       = "";
-	_rng        = 0;
-	_zonePos    = [];
+	_zone    = "";
+	_rng     = 0;
+	_zonePos = [];
 	// Declarations:
 		// Reserved space.
 	// If veh still in-game:
@@ -209,8 +209,11 @@ THY_fnc_SD_debugMonitor = {
 
 	params ["_unit"];
 	//private [];
+
+	// Escape:
+	if !SD_isOnDebugGlobal exitWith {};
 	
-	while { SD_isOnDebugGlobal } do {
+	while { alive _unit } do {
 		// Monitor:
 		hintSilent format [
 			"\n

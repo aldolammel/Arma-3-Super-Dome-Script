@@ -129,7 +129,7 @@ if !isServer exitWith {};
 		if SD_isProtectedVehicle then {
 			// Internal declarations:
 			_vehs = _zoneInfo # 3;
-			// Starts a new thread for each vehicle and static weapon that must be protected:
+			// Starts a new thread for each equipment (like vehicle and static weapon) that must be protected:
 			{ [_x, _zonesBySide] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehs;
 		};
 		// If protection for AI available:
