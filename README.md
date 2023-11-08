@@ -42,8 +42,7 @@ __
 - Added > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
+- Improved > Protected vehicles, even when empty, must respect the speed limit inside the protected zone to maintain their protection;
 - Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Improved > Small debug improvements;
 - Documentation has been updated.
