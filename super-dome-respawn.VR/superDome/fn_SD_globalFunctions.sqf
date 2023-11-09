@@ -22,6 +22,24 @@
 }; */
 
 
+THY_fnc_SD_isUsing_respawn = {
+	// This function checks if the object is using the Arma Respawn Vehicle Module.
+	// Returns _isUsing: bool.
+
+	params ["_obj"];
+	private ["_isUsing"];
+
+	// Initial values:
+	_isUsing = false;
+	// Declarations:
+		// Reserved space;
+	// Main function:
+	if ( !(_obj getVariable ["BIS_fnc_moduleRespawnVehicle_first", false]) && !isNil { _obj getVariable "BIS_fnc_moduleRespawnVehicle_mpKilled" } ) then { _isUsing = true };
+	// Return:
+	_isUsing;
+};
+
+
 THY_fnc_SD_equipment_autoRemoval = {
 	// This function will notify the crewmen, if there vehicle rollover at protected zone, it'll be deleted after a countdown.
 	// Returns nothing.
@@ -103,41 +121,33 @@ THY_fnc_SD_equipment_autoRemoval = {
 
 
 THY_fnc_SD_protection_equipment = {
-	// This function protects individualy each equipment (vehicle or static weapon) when inside of all zones from the same side of the zone originally scanned the object in its range at the mission get started.
+	// This function protects individualy each equipment (vehicle or static weapon) when inside of the range of all zones from the same side of the zone originally scanning the equipment at the mission starts.
 	// Param: _obj: vehicle or static weapon.
 	// Returns nothing.
 
 	params ["_zonesBySide", "_obj"];
-	private ["_rng", "_zonePos", "_var", "_isOnForThisVeh"];
+	private ["_rng", "_zonePos", "_var", "_isToRspwn"];
 
 	// Escape:
 		// Reserved space;
 	// Initial values:
-	_rng            = 0;
-	_zonePos        = [];
-	_var            = vehicleVarName _obj;
-	_isOnForThisVeh = false; 
-	// If the Mission Editor flags they have the intention to use Arma Respawn Vehicle Module on Eden, and...
-	// also the Editor set a custom varName on this vehicle, OR, already synced the vehicle to the Arma Vehicle Module ("bis_oX_XXXX" automatic set to each obj synced there):
-	// WIP : but if mission editor is using a custom varName and not syncing the object to the module, in this way it would be they're using to respawn but maybe is not the real case...
-	if ( SD_isAcceptingRespawn && _var select [0, 7] isNotEqualTo "norspwn" ) then {
-		// Probably this equipment must be respawned by Arma Respawn Vehicle Module when needed:
-		_isOnForThisVeh = true;
-	};
+	_rng     = 0;
+	_zonePos = [];
+	_var     = vehicleVarName _obj;
 	// Declarations:
-		// Reserved space;
+	_isToRspwn = [_obj] call THY_fnc_SD_isUsing_respawn;
 	// If _obj still in-game:
-	while { alive _obj || _isOnForThisVeh } do {
+	while { alive _obj || _isToRspwn } do {
 		// if this equipment should be covered by respawn system:
-		if _isOnForThisVeh then {
+		if _isToRspwn then {
 			// WIP - Check how to know how much respawns are available if the Editor has set a limit respawn number in Arma Respawn Vehicle Module... Important to stop this thread when the equipment won't be spawned again!
 			// Address a possible new-vehicle-object by the original varName:
 			_obj = missionNamespace getVariable _var;
 		};
 		// Escape > Stop the looping (If Zeus delete the vehicle, for example, it will be NULL but still running if was a vehicle using a Respawn Vehicle Module):
 		if ( isNull _obj ) then { break };
-		// Debug message:
-		//if SD_isOnDebugGlobal then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", str _obj]};
+		// Debug server message:
+		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", str _obj] };
 		//
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
@@ -153,8 +163,8 @@ THY_fnc_SD_protection_equipment = {
 					waitUntil {
 						// Looping breath:
 						sleep SD_checkDelay;
-						// Debug message:
-						//if ( SD_isOnDebugGlobal && objectParent player isEqualTo _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) on standby...", str _obj, name player]};
+						// Debug server message:
+						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) standby...", str _obj, name player] };
 						// Conditions to break the looping:
 						!alive _obj || _obj distance _zonePos > _rng || abs (speed _obj) > SD_speedLimit || (vectorUp _obj # 2) < SD_leanLimit;
 					};
@@ -182,7 +192,7 @@ THY_fnc_SD_protection_equipment = {
 			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
-	// Debug message:
+	// Debug server message:
 	if SD_isOnDebugGlobal then { systemChat format ["%1 An equipment thread was terminated!", SD_debugHeader]; sleep 3};
 	// Return:
 	true;
@@ -250,6 +260,7 @@ THY_fnc_SD_debugMonitor = {
 		hintSilent format [
 			"\n
 			\n--- SUPER DOME DEBUG ---
+			%12
 			\n
 			\nYou are: %1
 			\nYour side: %2
@@ -267,7 +278,6 @@ THY_fnc_SD_debugMonitor = {
 			\nSD player alerts: %7
 			\nSD visible markers: %8
 			\nSD stuff on Zeus: %9
-			\nSD accepting respawn: %12
 			\n
 			\n",
 			name _unit,
@@ -280,8 +290,8 @@ THY_fnc_SD_debugMonitor = {
 			if SD_isOnShowMarkers then {"ON"} else {"OFF"},
 			if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"},
 			if (!isNull (objectParent _unit)) then {if (isDamageAllowed (objectParent _unit)) then {"Is your veh protected: NOPE!\n"} else {"Is your veh protected: YES!\n"}} else {""},
-			if (SD_isAcceptingRespawn && !isNull (objectParent _unit)) then {if ((vehicleVarName (objectParent _unit)) select [0, 7] isEqualTo "norspwn") then {"Respawn available for: NO\n"} else {if ((vehicleVarName (objectParent _unit)) select [0, 5] isEqualTo "bis_o") then {"Respawn available for: YES\n"} else {"Respawn available for: NOT SURE\n"}}} else {""},
-			if SD_isAcceptingRespawn then {"ON"} else {"OFF"}
+			if (!isNull (objectParent _unit)) then {if ([objectParent _unit] call THY_fnc_SD_isUsing_respawn) then {"Respawn available for: YES\n"} else {"Respawn available for: NO\n"}} else {""},
+			if SD_isDebugDeeper then {"\nExtra debug information: ON\n"} else {""}
 		];
 		// Breath:
 		sleep 3;

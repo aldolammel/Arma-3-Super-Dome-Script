@@ -161,7 +161,7 @@ if !isServer exitWith {};
 		// Debug:
 		if SD_isOnDebugGlobal then {
 			// Message:
-			systemChat format ["%1 %2 '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
+			systemChat format ["%1 %2 > '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
 			SD_debugHeader, str _side, toUpper _mkr, if (count _vehsByZone > 0) then {count _vehsByZone} else {0}, if (count _aiUnitsByZone > 0) then {count _aiUnitsByZone} else {0}];
 			// Message breath:
 			sleep 3;
@@ -194,8 +194,8 @@ if !isServer exitWith {};
 				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 2/3:
 				_vehsByZone = _x # 3;
-				// Debug:
-				if SD_isOnDebugGlobal then {
+				// Debug server message:
+				if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then {
 					// Message:
 					systemChat format ["%1 %2 > Z%3 > EQPNTS:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
 					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _vehsByZone} else {"No equipment was found"}];
@@ -210,8 +210,8 @@ if !isServer exitWith {};
 				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 3/3:
 				_aiUnitsByZone = _x # 4;
-				// Debug:
-				if SD_isOnDebugGlobal then {
+				// Debug server message:
+				if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then {
 					// Message:
 					systemChat format ["%1 %2 > Z%3 > AIs:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
 					systemChat format ["%1.", if (count _aiUnitsByZone > 0) then {str _aiUnitsByZone} else {"No AI unit was found"}];
