@@ -11,22 +11,22 @@ if !isServer exitWith {};
 	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
 	
 	//params [""];
-	private ["_mkr", "_rng", "_side", "_vehsByZone", "_aiUnitsByZone", "_zonePos", "_vehsFound", "_counter", "_tag", "_var", "_result", "_zonesAllSides", "_zonesBySide"];
+	private ["_mkr", "_rng", "_side", "_objTypesByZone", "_vehsByZone", "_aiUnitsByZone", "_zonePos", "_tag", "_result", "_allProtectedVehs", "_dangerEqpnts", "_zonesAllSides", "_zonesBySide"];
 
 	// Initial values:
-	_mkr           = ""; 
-	_rng           = 0;
-	_side          = nil;
-	_vehsByZone    = [];
-	_aiUnitsByZone = [];
-	_zonePos       = [];
-	_vehsFound     = [];
-	_counter       = 0;
-	_tag           = "";
-	_var           = "";
-	_result        = [];
-	_zonesAllSides = [[/* 0=blu */],[/* 1=opf */],[/* 2=ind */],[/* 3=civ */]];
-	_zonesBySide   = [];
+	_mkr              = ""; 
+	_rng              = 0;
+	_side             = nil;
+	_objTypesByZone   = [];  // debug purposes.
+	_vehsByZone       = [];
+	_aiUnitsByZone    = [];
+	_zonePos          = [];
+	_tag              = "";
+	_result           = [];
+	_allProtectedVehs = [];
+	_dangerEqpnts     = [];
+	_zonesAllSides    = [[/* 0=blu */],[/* 1=opf */],[/* 2=ind */],[/* 3=civ */]];
+	_zonesBySide      = [];
 	// Declarations:
 	SD_serverSideStatus = "ON";
 	publicVariable "SD_serverSideStatus";
@@ -59,43 +59,20 @@ if !isServer exitWith {};
 		// SCAN > EQUIPMENTS:
 		if SD_isProtectedVehicle then {
 			// Seaching for equipments in the zone range:
-			_vehsFound = nearestObjects [_zonePos, SD_scanVehTypes, _rng];
+			_result = nearestObjects [_zonePos, SD_scanVehTypes, _rng];
 			// if something was found:
-			if ( count _vehsFound > 0 ) then {
-				// To number each varName:
-				_counter = 0;
-				// Validing each equipment will be found now:
-				{  // forEach _vehsFound:
-					// If no varName (not chosen by Editor or automatic set by Arma Respawn Vehicle Module):
-					if ( vehicleVarName _x isEqualTo "") then {  // "bis_oX_XXXX" is a varname set by Arma Respawn Vehicle Module when vehicle is synced to the module on Eden.
-						// Defining tag:
-						switch _side do {
-							case BLUFOR:      { _tag = "blu" };
-							case OPFOR:       { _tag = "opf" };
-							case INDEPENDENT: { _tag = "ind" };
-							case CIVILIAN:    { _tag = "civ" };
-						};
-						// Unique number:
-						_counter = _counter + 1;
-						// Building the varName as: _var = noRespawnTag_ + sideTag + zoneIndex + equipmentNumber (example: norspwn_blu_z1_eq1).
-						_var = "norspwn_" + _tag + "_z" + str (_i + 1) + "_eq" + (str _counter);
-						// Applying the varName built:
-						_x setVehicleVarName _var;
-						// Telling to Arma 3 Respawn Vehicle Module that this varName must be preserved after respawn if it happens:
-						_x call BIS_fnc_objectVar;  // https://community.bistudio.com/wiki/BIS_fnc_objectVar
-					};
-					// Adding each equipment found to the list:
-					_result pushBack _x;
-					// CPU breath:
-					sleep 0.1;
-				} forEach _vehsFound;
+			if ( count _result > 0 ) then {
 				// Recording them:
 				(SD_zonesCollection # _i) set [3, _result];
+				//
+				{ _allProtectedVehs pushBack _x } forEach _result;
 				// Adding to Zeus when debugging:
 				if ( SD_isOnDebugGlobal && SD_isOnZeusWhenDebug ) then { { _x addCuratorEditableObjects [_result, true]; sleep 0.1 } forEach allCurators };
 				// Clean to not duplicate stuff:
 				_result = [];
 			};
+			// CPU breath:
+			sleep 0.1;
 		};
 
 		// SCAN > AI UNITS:
@@ -161,7 +138,7 @@ if !isServer exitWith {};
 		// Debug:
 		if SD_isOnDebugGlobal then {
 			// Message:
-			systemChat format ["%1 %2 '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
+			systemChat format ["%1 %2 > '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
 			SD_debugHeader, str _side, toUpper _mkr, if (count _vehsByZone > 0) then {count _vehsByZone} else {0}, if (count _aiUnitsByZone > 0) then {count _aiUnitsByZone} else {0}];
 			// Message breath:
 			sleep 3;
@@ -169,7 +146,7 @@ if !isServer exitWith {};
 		// Additional CPU breath:
 		sleep 1;
 	};  // For-loop ends.
-	// Updating the global variable:
+	// Updating global variables:
 	publicVariable "SD_zonesCollection";
 
 	// STEP 2 - GIVING PROTECTION:
@@ -191,14 +168,17 @@ if !isServer exitWith {};
 		{  // forEach _zonesBySide:
 			// If protection for equipments available:
 			if SD_isProtectedVehicle then {
-				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 2/3:
 				_vehsByZone = _x # 3;
-				// Debug:
-				if SD_isOnDebugGlobal then {
+				// Debug server message:
+				if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then {
+					// Make objs more readable:
+					{ _objTypesByZone pushBack (typeOf _x) } forEach _vehsByZone;
 					// Message:
 					systemChat format ["%1 %2 > Z%3 > EQPNTS:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
-					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _vehsByZone} else {"No equipment was found"}];
+					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _objTypesByZone} else {"No equipment was found"}];
+					// Clean variable:
+					_objTypesByZone = [];
 					// Breath:
 					sleep 3;
 				};
@@ -207,14 +187,17 @@ if !isServer exitWith {};
 			};
 			// If protection for AI available:
 			if SD_isProtectedAI then {
-				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 3/3:
 				_aiUnitsByZone = _x # 4;
-				// Debug:
-				if SD_isOnDebugGlobal then {
+				// Debug server message:
+				if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then {
+					// Make objs more readable:
+					{ _objTypesByZone pushBack (typeOf _x) } forEach _aiUnitsByZone;
 					// Message:
 					systemChat format ["%1 %2 > Z%3 > AIs:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
-					systemChat format ["%1.", if (count _aiUnitsByZone > 0) then {str _aiUnitsByZone} else {"No AI unit was found"}];
+					systemChat format ["%1.", if (count _aiUnitsByZone > 0) then {str _objTypesByZone} else {"No AI unit was found"}];
+					// Clean variable:
+					_objTypesByZone = [];
 					// Breath:
 					sleep 3;
 				};
@@ -225,6 +208,47 @@ if !isServer exitWith {};
 		// CPU breath:
 		sleep 1;
 	};  // For-loop ends.
+	// Additional protection:
+	while { SD_isOnAdditionalProtection } do {
+		// Repeat for the same amount of zones available:
+		for "_i" from 0 to (count SD_zonesCollection) - 1 do {
+			// Internal Declarations:
+			_mkr     = (SD_zonesCollection # _i) # 0;
+			_rng     = (SD_zonesCollection # _i) # 1;
+			_zonePos = getMarkerPos _mkr;
+			// Search for unknown equipments that are rollovered (P.S: known vehicles are verify separately in their own threads with countdown):
+			_dangerEqpnts = (entities [["LandVehicle", "Air", "Ship"], []]) select {
+				// those in the zone:
+				_x distance2D _zonePos <= _rng &&
+				// those still alive:
+				alive _x &&
+				// WIP : those apparently unknown (dropped by Zeus or just random veh from the mission) (Critical: without this, veh just respawned will be weirdly added in this checking):
+				vehicleVarName _x isEqualTo "" &&
+				// those aren't watched by Super-Dome:
+				!(_x in _allProtectedVehs) &&
+				// those apparently rollovered:
+				(vectorUp _x # 2) < SD_leanLimit 
+			};
+			// Destroy them:
+			if ( count _dangerEqpnts > 0 ) then { { _x setDamage [1, false]; sleep SD_checkDelay } forEach _dangerEqpnts };
+			//
+			{  // Delete all potential wrecks:
+				// Debug server message:
+				if SD_isOnDebugGlobal then {
+					format ["%1 ANTI-WRECK > '%2' was deleted!",
+					SD_debugHeader, typeOf _x] call BIS_fnc_error;
+				};
+				// Delete the thing:
+				deleteVehicle _x;
+				// Breath:
+				sleep SD_checkDelay;
+			} forEach (allDead select { _x distance2D _zonePos <= _rng && !(_x isKindOf "Man") && !(_x isKindOf "House") });
+			// Internal breath:
+			sleep SD_checkDelay;
+		};  // for-loop ends.
+		// External breath:
+		sleep SD_AdditionalProtectTimer;
+	};
 };	// Spawn ends.
 // Return:
 true;

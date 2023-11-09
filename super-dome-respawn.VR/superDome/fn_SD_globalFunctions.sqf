@@ -44,15 +44,15 @@ THY_fnc_SD_equipment_autoRemoval = {
 	// This function will notify the crewmen, if there vehicle rollover at protected zone, it'll be deleted after a countdown.
 	// Returns nothing.
 
-	params ["_veh", "_rng", "_zonePos"];
+	params ["_obj", "_rng", "_zonePos"];
 	private ["_crew", "_tol", "_timeout"];
 
 	// Take the current crew:
-	_crew = crew _veh;
+	_crew = crew _obj;  // WIP - consider only human crewmen!
 	// Wait to see if the veh not just rollovered once before return to a regular position:
 	sleep 5;
 	// Escape:
-	if ( (vectorUp _veh # 2) >= SD_leanLimit ) exitWith {};
+	if ( (vectorUp _obj # 2) >= SD_leanLimit ) exitWith {};
 	// Initial values:
 	_tol = 0;
 	// If there's crew:
@@ -66,40 +66,42 @@ THY_fnc_SD_equipment_autoRemoval = {
 		// Timeout is cutted by half:
 		_tol = (SD_vehDelTolerance / 2);
 		// Debug message for hosted server player (editor):
-		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _veh] };
+		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _obj] };
 	};  
 	// Declarations:
 	_timeout = time + _tol;
 	// Waiting until the timeout runs, or veh pos be fixed, or veh explode, or be moved to out of zone:
-	waitUntil { sleep 5; time > _timeout || (vectorUp _veh # 2) >= SD_leanLimit || !alive _veh || _veh distance _zonePos > _rng };
+	waitUntil { sleep 5; time > _timeout || (vectorUp _obj # 2) >= SD_leanLimit || !alive _obj || _obj distance _zonePos > _rng };
 	// If veh still alive (Zeus can force a explosion or throw the veh out of zone):
-	if ( alive _veh ) then {
+	if ( alive _obj ) then {
 		// If somehow the veh gets out of zone (helicopter out of control, for example):
-		if ( _veh distance _zonePos > _rng ) then { 
+		if ( _obj distance _zonePos > _rng ) then { 
 			// Restore the veh fragility:
-			_veh allowDamage true;
+			_obj allowDamage true;
 		// If still in zone:
 		} else {
 			// If the regular veh pos is recovered:
-			if ( (vectorUp _veh # 2) >= SD_leanLimit ) then {
+			if ( (vectorUp _obj # 2) >= SD_leanLimit ) then {
 				// If there's crew:
 				if (count _crew > 0) then {
 					// Message to the crew (Mandatory):
 					[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
 				} else {
 					// Debug message:
-					if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _veh] };
+					if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _obj] };
 				};
 			// If veh still in a bad pos:
 			} else {
 				// Force the current crew (alive or unconscious) to leave the vehicle:
-				{ moveOut _x } forEach crew _veh;  // "crew _veh" will check only the current units inside the veh. Don't use _crew here!
+				{ moveOut _x } forEach crew _obj;  // "crew _obj" will check only the current units inside the veh. Don't use _crew here!
 				// Animation breath:
 				sleep 0.5;
-				// Delete the veh:
-				deleteVehicle _veh;
+				// ALTERNATIVALY: Delete the veh (but if the veh's using Arma Respawn Vehicle Module the veh won't spawn again)!
+				//deleteVehicle _obj;
+				// Destroy the vehicle:
+				_obj setDamage [1, false];
 				// Debug message:
-				if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been deleted.", SD_warnHeader, typeOf _veh] call BIS_fnc_error };
+				if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been destroyed.", SD_warnHeader, typeOf _obj] call BIS_fnc_error };
 			};
 		};
 	// If somehow the veh blew up:
@@ -110,10 +112,13 @@ THY_fnc_SD_equipment_autoRemoval = {
 			[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
 		} else {
 			// Debug message:
-			if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _veh] };
+			if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _obj] };
 		};
 		// Delete the wreck, if inside the zone:
-		if ( _veh distance _zonePos <= _rng ) then { deleteVehicle _veh };
+		if ( _obj distance _zonePos <= _rng ) then { 
+			// Delete the equipment:
+			deleteVehicle _obj;
+		};
 	};
 	// Return:
 	true;
@@ -147,7 +152,7 @@ THY_fnc_SD_protection_equipment = {
 		// Escape > Stop the looping (If Zeus delete the vehicle, for example, it will be NULL but still running if was a vehicle using a Respawn Vehicle Module):
 		if ( isNull _obj ) then { break };
 		// Debug server message:
-		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", str _obj] };
+		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", typeOf _obj] };
 		//
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
@@ -164,7 +169,7 @@ THY_fnc_SD_protection_equipment = {
 						// Looping breath:
 						sleep SD_checkDelay;
 						// Debug server message:
-						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) standby...", str _obj, name player] };
+						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj && !isNull _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) standby...", typeOf _obj, name player] };
 						// Conditions to break the looping:
 						!alive _obj || _obj distance _zonePos > _rng || abs (speed _obj) > SD_speedLimit || (vectorUp _obj # 2) < SD_leanLimit;
 					};
@@ -184,7 +189,10 @@ THY_fnc_SD_protection_equipment = {
 					// if _obj is destroyed:
 					} else {
 						// Delete the wreck, if inside the zone:
-						if ( _obj distance _zonePos <= _rng ) then { deleteVehicle _obj };
+						if ( _obj distance _zonePos <= _rng ) then { 
+							// Delete equipment:
+							deleteVehicle _obj;
+						};
 					};
 				};
 			};
@@ -275,10 +283,15 @@ THY_fnc_SD_debugMonitor = {
 			\nPlayers protection: %4
 			\nVehs protection: %5
 			\nAI protection: %6
+			\nNew checks after: %15s
 			\nSD player alerts: %7
 			\nSD visible markers: %8
 			\nSD stuff on Zeus: %9
 			\n
+			\n---
+			\n
+			\nAdditional protection: %13
+			%14
 			\n",
 			name _unit,
 			playerSide,
@@ -291,7 +304,10 @@ THY_fnc_SD_debugMonitor = {
 			if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"},
 			if (!isNull (objectParent _unit)) then {if (isDamageAllowed (objectParent _unit)) then {"Is your veh protected: NOPE!\n"} else {"Is your veh protected: YES!\n"}} else {""},
 			if (!isNull (objectParent _unit)) then {if ([objectParent _unit] call THY_fnc_SD_isUsing_respawn) then {"Respawn available for: YES\n"} else {"Respawn available for: NO\n"}} else {""},
-			if SD_isDebugDeeper then {"\nExtra debug information: ON\n"} else {""}
+			if SD_isDebugDeeper then {"\nExtra debug information: ON\n"} else {""},
+			if SD_isOnAdditionalProtection then {"ON\nNew checks after: "} else {"OFF\n"},
+			if SD_isOnAdditionalProtection then {(str SD_AdditionalProtectTimer) + "s\n"} else {""},
+			SD_checkDelay
 		];
 		// Breath:
 		sleep 3;

@@ -14,8 +14,8 @@ if !isServer exitWith {};
 		
 		SD_isOnSuperDome          = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
 			// Debugging:
-			SD_isOnDebugGlobal    = true;   // true = make your tests easier / false = turn it off. Default: false.
-			SD_isOnZeusWhenDebug  = true;   // true = when debugging only, all protected things will be added to zeus. Default: false.
+			SD_isOnDebugGlobal    = false;   // true = make your tests easier / false = turn it off. Default: false.
+			SD_isOnZeusWhenDebug  = false;   // true = when debugging only, all protected things will be added to zeus. Default: false.
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
 			SD_isProtectedVehicle = true;    // true = zones protect all vehicle and static weapons that spawn inside / false = doesnt protect. Default: true.
@@ -72,15 +72,19 @@ if !isServer exitWith {};
 		// Be careful even more here:
 
 			// In seconds, time before the next protection check for players, vehicles/static weapons, and AI units:
-			SD_checkDelay = 3;  // Default 3.
+			SD_checkDelay = 3;  // Default: 3.
 			// In seconds, how much time players got to fix vehicle position before it been deleted when it get upside-down in a protected zone:
-			SD_vehDelTolerance = 30;  // Default 30.
+			SD_vehDelTolerance = 30;  // Default: 30.
 			// Which types of vehicles the SD should scan if SD_isProtectedVehicle is true:
 			SD_scanVehTypes = ["Car", "Tank", "Helicopter", "Motocycle", "Plane", "StaticWeapon", "Ship", "Submarine"];
-			// In seconds, how much time the script must wait before to go into its functions right after the mission gets started:
-			SD_wait = 1;  // Default 1;
+			// It deletes after a while all potential unknown vehicles that are rollovered or left their wrecks in protected zones:
+			SD_isOnAdditionalProtection = true;  // Default: true.
+			// In seconds, the time of each new SD_isOnAdditionalProtection checks:
+			SD_AdditionalProtectTimer = 60;  // Default: 60
 			// It needs SD_isOnDebugGlobal as true to be available:
-			SD_isDebugDeeper = true;  // Default false.
+			SD_isDebugDeeper = false;  // Default: false.
+			// In seconds, how much time the script must wait before to go into its functions right after the mission gets started:
+			SD_wait = 1;  // Default: 1;
 
 
 	// DONT TOUCH //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +98,6 @@ if !isServer exitWith {};
 	if ( !SD_isOnSuperDome || { !SD_isProtectedPlayer && !SD_isProtectedVehicle && !SD_isProtectedAI } ) exitWith { if SD_isOnDebugGlobal then { systemChat format ["%1 Super-Dome was shut down by the mission editor!", SD_debugHeader] } };
 	// Initial values:
 	SD_zonesCollection  = [];
-	//SD_modulesFound     = [];
 	SD_serverSideStatus = "OFF";
 	SD_clientSideStatus = "OFF";
 	_mkr                = "";
@@ -192,16 +195,14 @@ if !isServer exitWith {};
 		// Force to show marker position already in pre-game screen (briefing, example) when in debug-mode:
 		if SD_isOnDebugGlobal then { _mkr setMarkerAlpha 1 } else { _mkr setMarkerAlpha 0 };
 	} forEach SD_zonesCollection;
-	// Tracking all Arma Respawn Vehicle Module on the mission:
-	//{ if (typeOf _x isEqualTo "ModuleRespawnVehicle_F") then { SD_modulesFound pushBack _x } } forEach (entities "Logic");
 	// Debug message:
 	if SD_isOnDebugGlobal then { systemChat format ["%1 Found %2 valid protected zone(s).", SD_debugHeader, count SD_zonesCollection] };
 	// Mission editor other warnings:
 	if ( SD_checkDelay < 2 ) then { systemChat format ["%1 When 'SD_checkDelay' is less than 2secs (current=%2) this may impact on server and client CPU performances.", SD_warnHeader, SD_checkDelay] }; if ( SD_checkDelay > 5 ) then { systemChat format ["%1 When 'SD_checkDelay' is more than 5secs (current=%2) this may impact the reliability of the protection in some cases.", SD_warnHeader, SD_checkDelay] }; if ( SD_speedLimit isNotEqualTo 30 ) then { systemChat format ["%1 To change 'SD_speedLimit' value (default=30) can break the script logic easily. Be super careful!", SD_warnHeader] };
 	// Errors handling:
-	if ( SD_wait < 1 ) then { SD_wait = 1; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_wait' value CANNOT be less than 1. The value was fixed to the minimum.", SD_debugHeader] } }; if ( SD_vehDelTolerance < 10 ) then { SD_vehDelTolerance = 10; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_vehDelTolerance' value CANNOT be less than 10. The value was fixed to the minimum.", SD_debugHeader] } };	if ( count SD_scanVehTypes isEqualTo 0 ) then { SD_scanVehTypes = ["Car", "Tank", "Helicopter", "Motocycle"]; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_scanVehTypes' looks empty. The basic vehicle types was set again.", SD_debugHeader] } };
+	if ( SD_wait < 1 ) then { SD_wait = 1; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_wait' value CANNOT be less than 1. The value was fixed to the minimum.", SD_debugHeader] } }; if ( SD_vehDelTolerance < 10 ) then { SD_vehDelTolerance = 10; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_vehDelTolerance' value CANNOT be less than 10. The value was fixed to the minimum.", SD_debugHeader] } };	if ( count SD_scanVehTypes isEqualTo 0 ) then { SD_scanVehTypes = ["Car", "Tank", "Helicopter", "Motocycle"]; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_scanVehTypes' looks empty. The basic vehicle types was set again.", SD_debugHeader] } }; if ( !SD_isOnDebugGlobal && SD_AdditionalProtectTimer < 20 ) then { systemChat format ["%1 fn_SD_management.sqf > You're using %2 secs for 'SD_AdditionalProtectTimer'. The minimum is 20. Fix it!", SD_warnHeader, SD_AdditionalProtectTimer]; SD_AdditionalProtectTimer = 60 };
 	// Declaring the global variables - part 2/2:
-	publicVariable "SD_warnHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; /* publicVariable "SD_modulesFound"; */ publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait"; publicVariable "SD_isDebugDeeper";
+	publicVariable "SD_warnHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait"; publicVariable "SD_isOnAdditionalProtection"; publicVariable "SD_AdditionalProtectTimer"; publicVariable "SD_isDebugDeeper";
 };
 // return:
 true;

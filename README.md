@@ -39,13 +39,13 @@ __
 
 ## CHANGELOG
 
-**Nov, XXth 2023 | v1.5**
+**Nov, 9th 2023 | v1.5**
 - Added > Support to missions with respawn-points for players, vehicles and static weapons (turrets);
-- Added > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
-- Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
+- Added > New layer of protection called "Additional Protection" (turn ON/OFF) where the server checks separately unknown stuck vehicles or its wrecks, and remove them;
+- Fixed > Massive QA tests performed, addressing a few bugs already fixed;
+- Fixed > Non-protected vehicles, when destroyed inside the protected zone, their wrecks weren't deleted;
 - Improved > Protected vehicles, even when empty, must respect the speed limit inside the protected zone to maintain their protection;
-- Improved > xxxxxxxxxxxxxxxxxxxxxxxx;
+- Improved > Better support to Zeus module;
 - Improved > Important debug improvements;
 - Documentation has been updated.
 
