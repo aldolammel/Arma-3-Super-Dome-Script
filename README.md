@@ -38,7 +38,7 @@ __
 ## CHANGELOG
 
 **Nov, XXth 2023 | v1.5**
-- Added > Support to missions with respawn-points;
+- Added > Support to missions with respawn-points for players, vehicles and static weapons (turrets);
 - Added > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;
 - Fixed > xxxxxxxxxxxxxxxxxxxxxxxx;

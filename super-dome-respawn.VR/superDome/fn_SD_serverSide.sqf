@@ -77,8 +77,8 @@ if !isServer exitWith {};
 						};
 						// Unique number:
 						_counter = _counter + 1;
-						// Building the varName as: _var = noRespawnTag_ + sideTag + zoneIndex + equipmentNumber (example: norspwn_blu_z0_eq1).
-						_var = "norspwn_" + _tag + "_z" + (str _i) + "_eq" + (str _counter);
+						// Building the varName as: _var = noRespawnTag_ + sideTag + zoneIndex + equipmentNumber (example: norspwn_blu_z1_eq1).
+						_var = "norspwn_" + _tag + "_z" + str (_i + 1) + "_eq" + (str _counter);
 						// Applying the varName built:
 						_x setVehicleVarName _var;
 						// Telling to Arma 3 Respawn Vehicle Module that this varName must be preserved after respawn if it happens:
@@ -86,13 +86,15 @@ if !isServer exitWith {};
 					};
 					// Adding each equipment found to the list:
 					_result pushBack _x;
+					// CPU breath:
+					sleep 0.1;
 				} forEach _vehsFound;
 				// Recording them:
 				(SD_zonesCollection # _i) set [3, _result];
 				// Adding to Zeus when debugging:
 				if ( SD_isOnDebugGlobal && SD_isOnZeusWhenDebug ) then { { _x addCuratorEditableObjects [_result, true]; sleep 0.1 } forEach allCurators };
-				// CPU breath:
-				sleep 0.25;
+				// Clean to not duplicate stuff:
+				_result = [];
 			};
 		};
 
@@ -106,9 +108,11 @@ if !isServer exitWith {};
 				(SD_zonesCollection # _i) set [4, _result];
 				// Adding to Zeus when debugging:
 				if ( SD_isOnDebugGlobal && SD_isOnZeusWhenDebug ) then { { _x addCuratorEditableObjects [_result, true]; sleep 0.1 } forEach allCurators };
-				// CPU breath:
-				sleep 0.25;
+				// Clean to not duplicate stuff:
+				_result = [];
 			};
+			// CPU breath:
+			sleep 0.1;
 		};
 
 
@@ -162,9 +166,6 @@ if !isServer exitWith {};
 			// Message breath:
 			sleep 3;
 		};
-		// Clean variables to the next usage:
-		_vehsByZone    = [];
-		_aiUnitsByZone = [];
 		// Additional CPU breath:
 		sleep 1;
 	};  // For-loop ends.
@@ -174,7 +175,15 @@ if !isServer exitWith {};
 	// STEP 2 - GIVING PROTECTION:
 	// Check each side based on _zonesAllSides HASHMAP:
 	for "_i" from 0 to 3 do {
-		systemChat str _i;
+		// Debug purposes:
+		if SD_isOnDebugGlobal then {
+			switch _i do {
+				case 0: { _tag = "WEST" };
+				case 1: { _tag = "EAST" };
+				case 2: { _tag = "RESI" };
+				case 3: { _tag = "CIVI" };
+			};
+		};
 		// Internal declarations - part 1/3:
 		_zonesBySide = _zonesAllSides # _i;
 		// Escape if index content's empty:
@@ -185,7 +194,14 @@ if !isServer exitWith {};
 				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 2/3:
 				_vehsByZone = _x # 3;
-				systemChat str _vehsByZone;
+				// Debug:
+				if SD_isOnDebugGlobal then {
+					// Message:
+					systemChat format ["%1 %2 > Z%3 > EQPNTS:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
+					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _vehsByZone} else {"No equipment was found"}];
+					// Breath:
+					sleep 3;
+				};
 				// Starts a new thread for each equipment of a specific side (like vehicle and static weapon that must be protected):
 				{ [_zonesBySide, _x] spawn THY_fnc_SD_protection_equipment; sleep 0.1 } forEach _vehsByZone;  // each = obj
 			};
@@ -194,13 +210,20 @@ if !isServer exitWith {};
 				// WIP - what if this forEach below is empty?
 				// Internal declarations - part 3/3:
 				_aiUnitsByZone = _x # 4;
+				// Debug:
+				if SD_isOnDebugGlobal then {
+					// Message:
+					systemChat format ["%1 %2 > Z%3 > AIs:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
+					systemChat format ["%1.", if (count _aiUnitsByZone > 0) then {str _aiUnitsByZone} else {"No AI unit was found"}];
+					// Breath:
+					sleep 3;
+				};
 				// Starts a new thread for each AI must be protected:
 				{ [_zonesBySide, _x] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnitsByZone;  // each = obj
 			};
-
 		} forEach _zonesBySide;
 		// CPU breath:
-		sleep SD_checkDelay;
+		sleep 1;
 	};  // For-loop ends.
 };	// Spawn ends.
 // Return:

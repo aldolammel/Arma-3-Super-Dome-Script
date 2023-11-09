@@ -120,7 +120,7 @@ THY_fnc_SD_protection_equipment = {
 	// If the Mission Editor flags they have the intention to use Arma Respawn Vehicle Module on Eden, and...
 	// also the Editor set a custom varName on this vehicle, OR, already synced the vehicle to the Arma Vehicle Module ("bis_oX_XXXX" automatic set to each obj synced there):
 	// WIP : but if mission editor is using a custom varName and not syncing the object to the module, in this way it would be they're using to respawn but maybe is not the real case...
-	if ( SD_isOnRespawnVeh && _var select [0, 7] isNotEqualTo "norspwn" ) then {
+	if ( SD_isAcceptingRespawn && _var select [0, 7] isNotEqualTo "norspwn" ) then {
 		// Probably this equipment must be respawned by Arma Respawn Vehicle Module when needed:
 		_isOnForThisVeh = true;
 	};
@@ -134,8 +134,10 @@ THY_fnc_SD_protection_equipment = {
 			// Address a possible new-vehicle-object by the original varName:
 			_obj = missionNamespace getVariable _var;
 		};
+		// Escape > Stop the looping (If Zeus delete the vehicle, for example, it will be NULL but still running if was a vehicle using a Respawn Vehicle Module):
+		if ( isNull _obj ) then { break };
 		// Debug message:
-		//if SD_isOnDebugGlobal then { systemChat format ["%1 '%2' thread still running...", SD_debugHeader, str _obj]};
+		//if SD_isOnDebugGlobal then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", str _obj]};
 		//
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
@@ -144,15 +146,22 @@ THY_fnc_SD_protection_equipment = {
 			// if inside the protection range:
 			if ( _obj distance _zonePos <= _rng ) then {
 				// if respecting the speed limit:
-				//if ( abs (speed _obj) <= SD_speedLimit ) then {
+				if ( abs (speed _obj) <= SD_speedLimit ) then {
 					// Makes _obj unbreakable:
 					_obj allowDamage false;
 					// wait until the _obj (somehow) explodes, or get far away from zone, or exceed the speed limit, or rollover:
-					waitUntil { sleep SD_checkDelay; !alive _obj || _obj distance _zonePos > _rng || abs (speed _obj) > SD_speedLimit || (vectorUp _obj # 2) < SD_leanLimit };
+					waitUntil {
+						// Looping breath:
+						sleep SD_checkDelay;
+						// Debug message:
+						//if ( SD_isOnDebugGlobal && objectParent player isEqualTo _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) on standby...", str _obj, name player]};
+						// Conditions to break the looping:
+						!alive _obj || _obj distance _zonePos > _rng || abs (speed _obj) > SD_speedLimit || (vectorUp _obj # 2) < SD_leanLimit;
+					};
 					// If _obj still alive:
 					if ( alive _obj ) then {
-						// still inside the zone:
-						if ( _obj distance _zonePos <= _rng ) then {
+						// still inside the zone, and respecting the speed limit:
+						if ( _obj distance _zonePos <= _rng && abs (speed _obj) <= SD_speedLimit ) then {
 							// If _obj rollovered:
 							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
 								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
@@ -167,12 +176,14 @@ THY_fnc_SD_protection_equipment = {
 						// Delete the wreck, if inside the zone:
 						if ( _obj distance _zonePos <= _rng ) then { deleteVehicle _obj };
 					};
-				//};
+				};
 			};
 			// Breath:
 			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
+	// Debug message:
+	if SD_isOnDebugGlobal then { systemChat format ["%1 An equipment thread was terminated!", SD_debugHeader]; sleep 3};
 	// Return:
 	true;
 };
@@ -217,6 +228,8 @@ THY_fnc_SD_protection_aiUnit = {
 			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
+	// Debug message:
+	if SD_isOnDebugGlobal then { systemChat format ["%1 An AI thread was terminated!", SD_debugHeader]; sleep 3};
 	// Return:
 	true;
 };
@@ -254,6 +267,7 @@ THY_fnc_SD_debugMonitor = {
 			\nSD player alerts: %7
 			\nSD visible markers: %8
 			\nSD stuff on Zeus: %9
+			\nSD accepting respawn: %12
 			\n
 			\n",
 			name _unit,
@@ -266,7 +280,8 @@ THY_fnc_SD_debugMonitor = {
 			if SD_isOnShowMarkers then {"ON"} else {"OFF"},
 			if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"},
 			if (!isNull (objectParent _unit)) then {if (isDamageAllowed (objectParent _unit)) then {"Is your veh protected: NOPE!\n"} else {"Is your veh protected: YES!\n"}} else {""},
-			if (SD_isOnRespawnVeh && !isNull (objectParent _unit)) then {if ((vehicleVarName (objectParent _unit)) select [0, 7] isEqualTo "norspwn") then {"Respawn available for: NO\n"} else {if ((vehicleVarName (objectParent _unit)) select [0, 5] isEqualTo "bis_o") then {"Respawn available for: YES\n"} else {"Respawn available for: NOT SURE\n"}}} else {""}
+			if (SD_isAcceptingRespawn && !isNull (objectParent _unit)) then {if ((vehicleVarName (objectParent _unit)) select [0, 7] isEqualTo "norspwn") then {"Respawn available for: NO\n"} else {if ((vehicleVarName (objectParent _unit)) select [0, 5] isEqualTo "bis_o") then {"Respawn available for: YES\n"} else {"Respawn available for: NOT SURE\n"}}} else {""},
+			if SD_isAcceptingRespawn then {"ON"} else {"OFF"}
 		];
 		// Breath:
 		sleep 3;
