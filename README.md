@@ -1,7 +1,7 @@
 # Arma 3 / SD: Super Dome v1.5
 >*Dependencies: none.*
 
-SD is an Arma 3 script that's a smart protection against damage for players, vehicles and AI units when them are within editable zones. The protected zones have automatic removal of wrecks and overturned vehicles, in addition to small automations relating to the protected zones integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
+SD is an Arma 3 script that's a smart protection against damage for players, vehicles, and AI units when they are within pre-defined zones. The protected zones have automatic removal of wrecks and rolled-over vehicles, in addition to small automation relating to the protected zone's integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
 
 Creation concept: turn specific game zones into safe places for players, areas proof against their enemies and themselves.
 
