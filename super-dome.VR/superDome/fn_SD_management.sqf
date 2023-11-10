@@ -14,7 +14,7 @@ if !isServer exitWith {};
 		
 		SD_isOnSuperDome          = true;    // true = enable the script to run / false = it doesnt be loaded. Default: true.
 			// Debugging:
-			SD_isOnDebugGlobal    = false;   // true = make your tests easier / false = turn it off. Default: false.
+			SD_isOnDebugGlobal    = true;   // true = make your tests easier / false = turn it off. Default: false.
 			SD_isOnZeusWhenDebug  = false;   // true = when debugging only, all protected things will be added to zeus. Default: false.
 			// Protections:
 			SD_isProtectedPlayer  = true;    // true = zones protect all player of the same side / false = doesnt protect. Default: true.
@@ -79,7 +79,7 @@ if !isServer exitWith {};
 			SD_scanVehTypes = ["Car", "Tank", "Helicopter", "Motocycle", "Plane", "StaticWeapon", "Ship", "Submarine"];
 			// It deletes after a while all potential unknown vehicles that are rollovered or left their wrecks in protected zones:
 			SD_isOnAdditionalProtection = true;  // Default: true.
-			// In seconds, the time of each new SD_isOnAdditionalProtection checks:
+			// In seconds, the time for each new SD_isOnAdditionalProtection checks:
 			SD_AdditionalProtectTimer = 60;  // Default: 60
 			// It needs SD_isOnDebugGlobal as true to be available:
 			SD_isDebugDeeper = false;  // Default: false.
@@ -95,7 +95,7 @@ if !isServer exitWith {};
 	// Declaring the global variables - part 1/2:
 	publicVariable "SD_isOnSuperDome"; publicVariable "SD_isOnDebugGlobal"; publicVariable "SD_isOnZeusWhenDebug"; publicVariable "SD_isProtectedPlayer"; publicVariable "SD_isProtectedVehicle"; publicVariable "SD_isProtectedAI"; publicVariable "SD_isOnShowMarkers"; publicVariable "SD_isOnAlerts"; publicVariable "SD_debugHeader";
 	// Escape:
-	if ( !SD_isOnSuperDome || { !SD_isProtectedPlayer && !SD_isProtectedVehicle && !SD_isProtectedAI } ) exitWith { if SD_isOnDebugGlobal then { systemChat format ["%1 Super-Dome was shut down by the mission editor!", SD_debugHeader] } };
+	if ( !SD_isOnSuperDome || { !SD_isProtectedPlayer && !SD_isProtectedVehicle && !SD_isProtectedAI && !SD_isOnAdditionalProtection } ) exitWith { if SD_isOnDebugGlobal then { systemChat format ["%1 Super-Dome was completely shut down by the mission editor!", SD_debugHeader] } };
 	// Initial values:
 	SD_zonesCollection  = [];
 	SD_serverSideStatus = "OFF";

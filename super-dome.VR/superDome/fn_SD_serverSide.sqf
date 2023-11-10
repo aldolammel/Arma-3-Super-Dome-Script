@@ -8,7 +8,7 @@ if !isServer exitWith {};
 
 [] spawn {
 	// Escape:
-	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI }) exitWith {};
+	if ( !SD_isOnSuperDome || { !SD_isProtectedVehicle && !SD_isProtectedAI && !SD_isOnAdditionalProtection }) exitWith {};
 	
 	//params [""];
 	private ["_mkr", "_rng", "_side", "_objTypesByZone", "_vehsByZone", "_aiUnitsByZone", "_zonePos", "_tag", "_result", "_allProtectedVehs", "_dangerEqpnts", "_zonesAllSides", "_zonesBySide"];
@@ -230,7 +230,7 @@ if !isServer exitWith {};
 				(vectorUp _x # 2) < SD_leanLimit 
 			};
 			// Destroy them:
-			if ( count _dangerEqpnts > 0 ) then { { _x setDamage [1, false]; sleep SD_checkDelay } forEach _dangerEqpnts };
+			if ( count _dangerEqpnts > 0 ) then { { _x setDamage [1, false]; sleep 0.5 } forEach _dangerEqpnts };
 			//
 			{  // Delete all potential wrecks:
 				// Debug server message:
