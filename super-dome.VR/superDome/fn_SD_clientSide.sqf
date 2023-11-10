@@ -126,7 +126,7 @@ while { alive _unit } do {
 				}
 			};
 		};
-		// Breath:
+		// Breather:
 		sleep SD_checkDelay;
 	} forEach _sideZones;
 }; // while-looping ends.

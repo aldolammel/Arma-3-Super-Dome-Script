@@ -17,14 +17,14 @@ __
 
 - No dependencies from mods or other scripts;
 - SD works with two layers: player protection is managed by client-side, meanwhile vehicles and AI units by server-side;
-- No need set variables on Eden or anywhere else;
+- No need to set variables on Eden or anywhere else;
 - Set up to 10 protected zones easily with drag-and-drop Eden markers;
 - Turn ON/OFF the protected zones to cover all vehicles and static-weapons (turrets) inside;
 - Turn ON/OFF the protected zones to cover all AI units inside;
 - Turn ON/OFF the protected zones to cover all players by side;
 - NEW! - Support to Eden Respawn Vehicle Module; 
 - Auto-removal for wrecks and rolled over vehicles in the zone;
-- Smart speed limit (to desactivate the protection and accept hard collisions) and wreck delete when inside the zone;
+- Smart speed limit (to disable the protection and accept hard collisions) and wreck delete when inside the zone;
 - Debugging: friendly feedback messages;
 - Debugging: automatic errors handling;
 - Full documentation available.

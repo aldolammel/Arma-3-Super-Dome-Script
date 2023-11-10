@@ -71,7 +71,7 @@ if !isServer exitWith {};
 				// Clean to not duplicate stuff:
 				_result = [];
 			};
-			// CPU breath:
+			// CPU breather:
 			sleep 0.1;
 		};
 
@@ -88,7 +88,7 @@ if !isServer exitWith {};
 				// Clean to not duplicate stuff:
 				_result = [];
 			};
-			// CPU breath:
+			// CPU breather:
 			sleep 0.1;
 		};
 
@@ -140,10 +140,10 @@ if !isServer exitWith {};
 			// Message:
 			systemChat format ["%1 %2 > '%3' zone has %4 equipment(s) and %5 AI(s) protected.",
 			SD_debugHeader, str _side, toUpper _mkr, if (count _vehsByZone > 0) then {count _vehsByZone} else {0}, if (count _aiUnitsByZone > 0) then {count _aiUnitsByZone} else {0}];
-			// Message breath:
+			// Message breather:
 			sleep 3;
 		};
-		// Additional CPU breath:
+		// Additional CPU breather:
 		sleep 1;
 	};  // For-loop ends.
 	// Updating global variables:
@@ -179,7 +179,7 @@ if !isServer exitWith {};
 					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _objTypesByZone} else {"No equipment was found"}];
 					// Clean variable:
 					_objTypesByZone = [];
-					// Breath:
+					// Breather:
 					sleep 3;
 				};
 				// Starts a new thread for each equipment of a specific side (like vehicle and static weapon that must be protected):
@@ -198,14 +198,14 @@ if !isServer exitWith {};
 					systemChat format ["%1.", if (count _aiUnitsByZone > 0) then {str _objTypesByZone} else {"No AI unit was found"}];
 					// Clean variable:
 					_objTypesByZone = [];
-					// Breath:
+					// Breather:
 					sleep 3;
 				};
 				// Starts a new thread for each AI must be protected:
 				{ [_zonesBySide, _x] spawn THY_fnc_SD_protection_aiUnit; sleep 0.1 } forEach _aiUnitsByZone;  // each = obj
 			};
 		} forEach _zonesBySide;
-		// CPU breath:
+		// CPU breather:
 		sleep 1;
 	};  // For-loop ends.
 	// Additional protection:
@@ -216,7 +216,7 @@ if !isServer exitWith {};
 			_mkr     = (SD_zonesCollection # _i) # 0;
 			_rng     = (SD_zonesCollection # _i) # 1;
 			_zonePos = getMarkerPos _mkr;
-			// Search for unknown equipments that are rollovered (P.S: known vehicles are verify separately in their own threads with countdown):
+			// Search for unknown equipments that are rolled over (P.S: known vehicles are verify separately in their own threads with countdown):
 			_dangerEqpnts = (entities [["LandVehicle", "Air", "Ship"], []]) select {
 				// those in the zone:
 				_x distance2D _zonePos <= _rng &&
@@ -226,7 +226,7 @@ if !isServer exitWith {};
 				vehicleVarName _x isEqualTo "" &&
 				// those aren't watched by Super-Dome:
 				!(_x in _allProtectedVehs) &&
-				// those apparently rollovered:
+				// those apparently rolled over:
 				(vectorUp _x # 2) < SD_leanLimit 
 			};
 			// Destroy them:
@@ -240,13 +240,13 @@ if !isServer exitWith {};
 				};
 				// Delete the thing:
 				deleteVehicle _x;
-				// Breath:
+				// Breather:
 				sleep SD_checkDelay;
 			} forEach (allDead select { _x distance2D _zonePos <= _rng && !(_x isKindOf "Man") && !(_x isKindOf "House") });
-			// Internal breath:
+			// Internal breather:
 			sleep SD_checkDelay;
 		};  // for-loop ends.
-		// External breath:
+		// External breather:
 		sleep SD_AdditionalProtectTimer;
 	};
 };	// Spawn ends.

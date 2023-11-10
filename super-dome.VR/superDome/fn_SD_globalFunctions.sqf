@@ -72,7 +72,7 @@ THY_fnc_SD_equipment_autoRemoval = {
 
 	// take the current crew (but considering only the human ones):
 	_crew = ((crew _obj) select { alive _x && isPlayer _x }) - entities "HeadlessClient_F";
-	// Wait to see if the veh not just rollovered once before return to a regular position:
+	// Wait to see if the veh not just rolled over once before return to a regular position:
 	sleep 5;
 	// Escape:
 	if ( (vectorUp _obj # 2) >= SD_leanLimit ) exitWith {};
@@ -117,7 +117,7 @@ THY_fnc_SD_equipment_autoRemoval = {
 			} else {
 				// Force the current crew (alive or unconscious) to leave the vehicle:
 				{ moveOut _x } forEach crew _obj;  // "crew _obj" will check only the current units inside the veh. Don't use _crew here!
-				// Animation breath:
+				// Animation breather:
 				sleep 0.5;
 				// ALTERNATIVALY: Delete the veh (but if the veh's using Arma Respawn Vehicle Module the veh won't spawn again)!
 				//deleteVehicle _obj;
@@ -190,7 +190,7 @@ THY_fnc_SD_protection_equipment = {
 					_obj allowDamage false;
 					// wait until the _obj (somehow) explodes, or get far away from zone, or exceed the speed limit, or rollover:
 					waitUntil {
-						// Looping breath:
+						// Looping breather:
 						sleep SD_checkDelay;
 						// Debug server message:
 						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj && !isNull _obj ) then { systemChat format ["> '%1' (w/ %2) keeps on standby.", typeOf _obj, name player] };
@@ -209,7 +209,7 @@ THY_fnc_SD_protection_equipment = {
 					if ( alive _obj ) then {
 						// still inside the zone, and respecting the speed limit:
 						if ( _obj distance _zonePos <= _rng && abs (speed _obj) <= SD_speedLimit && abs ((velocity _obj) # 2) <= SD_velocityLimit ) then {
-							// If _obj rollovered:
+							// If _obj rolled over:
 							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
 								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
 							};
@@ -228,7 +228,7 @@ THY_fnc_SD_protection_equipment = {
 					};
 				};
 			};
-			// Breath:
+			// Breather:
 			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
@@ -274,7 +274,7 @@ THY_fnc_SD_protection_aiUnit = {
 					_obj allowDamage true;
 				};
 			};
-			// Breath:
+			// Breather:
 			sleep SD_checkDelay;
 		} forEach _zonesBySide;
 	};  // While-loop ends.
@@ -341,7 +341,7 @@ THY_fnc_SD_debugMonitor = {
 			if SD_isOnAdditionalProtection then {(str SD_AdditionalProtectTimer) + "s\n"} else {""},
 			SD_checkDelay
 		];
-		// Breath:
+		// Breather:
 		sleep 3;
 	};
 	// Return:
