@@ -9,7 +9,7 @@ Creation concept: turn specific game zones into safe places for players, areas p
 
 video demo: soon.
 
-Documentation: https://github.com/aldolammel/Arma-3-Super-Dome-Script/blob/main/super-dome.VR/superDome/_SD_Script_Documentation.pdf
+Documentation: https://github.com/aldolammel/Arma-3-Super-Dome-Script/blob/main/_SD_Script_Documentation.pdf
 
 __
 
