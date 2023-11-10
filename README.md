@@ -39,7 +39,7 @@ __
 
 ## CHANGELOG
 
-**Nov, 9th 2023 | v1.5**
+**Nov, 10th 2023 | v1.5**
 - Added > Support to missions with respawn-points for players, vehicles and static weapons (turrets);
 - Added > New layer of protection called "Additional Protection" (turn ON/OFF) where the server checks separately unknown stuck vehicles or its wrecks, and remove them;
 - Fixed > Massive QA tests performed, addressing a few bugs already fixed;
