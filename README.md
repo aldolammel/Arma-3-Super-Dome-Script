@@ -1,4 +1,4 @@
-# Arma 3 / SD: Super Dome v1.2.1
+# Arma 3 / SD: Super Dome v1.5
 >*Dependencies: none.*
 
 SD is an Arma 3 script that's a smart protection against damage for players, vehicles and AI units when them are within editable zones. The protected zones have automatic removal of wrecks and overturned vehicles, in addition to small automations relating to the protected zones integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
@@ -15,12 +15,14 @@ __
 
 ## SCRIPT DETAILS
 
-- No dependencies from other mods or scripts;
-- SD works with two layers: player protection is managed by client-side, meanwhile vehicles and AI units by server-side; 
+- No dependencies from mods or other scripts;
+- SD works with two layers: player protection is managed by client-side, meanwhile vehicles and AI units by server-side;
+- No need set variables on Eden or anywhere else;
 - Set up to 10 protected zones easily with drag-and-drop Eden markers;
-- Turn ON/OFF the protected zones to cover all vehicles and static-turrets inside;
+- Turn ON/OFF the protected zones to cover all vehicles and static-weapons (turrets) inside;
 - Turn ON/OFF the protected zones to cover all AI units inside;
 - Turn ON/OFF the protected zones to cover all players by side;
+- NEW! - Support to Eden Respawn Vehicle Module; 
 - Auto-removal for wrecks and rolled over vehicles in the zone;
 - Smart speed limit (to desactivate the protection and accept hard collisions) and wreck delete when inside the zone;
 - Debugging: friendly feedback messages;
@@ -36,6 +38,17 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/244082-rele
 __
 
 ## CHANGELOG
+
+**Nov, 10th 2023 | v1.5**
+- Added > Support to missions with respawn-points for players, vehicles and static weapons (turrets);
+- Added > New layer of protection called "Additional Protection" (turn ON/OFF) where the server checks separately unknown stuck vehicles or its wrecks, and remove them;
+- Fixed > Massive QA tests performed, addressing a few bugs already fixed;
+- Fixed > Non-protected vehicles, when destroyed inside the protected zone, their wrecks weren't deleted;
+- Improved > Protected vehicles, even when empty, must respect the speed limit (horizontal and vertical) inside the protected zone to maintain their protection;
+- Improved > Players under the water with no diving gears, won't be immortal even in protected zones;
+- Improved > Better support to Zeus module;
+- Improved > Important debug improvements;
+- Documentation has been updated.
 
 **Nov, 5th 2023 | v1.2.1**
 - Fixed > When a vehicle rolled over 2 or more times inside the protected zone, the anti-rollover system stoped working properly.

@@ -1,0 +1,35 @@
+//BASIC CONFIGS
+class Header {
+	gameType 				= Sandbox;
+	minPlayers				= 1;
+	maxPlayers				= 6;
+};
+	// About
+	onLoadName 				= "SUPER-DOME (RESPAWN)";
+	author 					= "thy";
+	overviewPicture 		= "images\thumb.jpg";
+	onLoadMission 			= "SD is a smart script to protect players, vehicles, static weapons, and/or AI units while in specific zones.";
+	
+	// Gameplay
+	joinUnassigned     = 0;
+	respawnButton      = 1;
+	enableTeamSwitch   = true;
+	respawn            = 3;
+	respawnOnStart     = 1;  // -1 = Dont respawn on start and don't run respawn script on start. / 0 = Dont respawn on start but run respawn script on start. / 1 = Respawn on start. Run respawn script on start.
+	respawnDelay       = 5;
+	respawnTemplates[] = { "MenuPosition", "MenuInventory", "Wave" };
+	respawnDialog      = 0; 
+	debriefing         = 1;
+	saving             = 0;
+	enableDebugConsole = 1; 
+	
+	// Performance
+	DisabledAI         = 1;
+	
+
+class CfgFunctions {
+
+	// SUPER DOME:
+	#include "superDome\THY_SD_functions.hpp"
+	
+};
