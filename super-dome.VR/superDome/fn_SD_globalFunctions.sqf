@@ -40,6 +40,29 @@ THY_fnc_SD_isUsing_respawn = {
 };
 
 
+/* THY_fnc_SD_canFloat = {
+	// This function checks if the object/vehicle are able to float.
+	// Returns _canFloat: bool
+
+	params ["_obj"];
+	private ["_canFloat", "_floatVal"];
+
+	// Initial values:
+	_canFloat = false;
+	// Declarations:
+		// Reserved space;
+	// Main function:
+	_floatVal = _obj getVariable ['TAG_canFloat', -1];
+	if ( _floatVal isEqualTo -1 ) then {
+		_floatVal = getNumber (configFile >> 'CfgVehicles' >> (typeOf _obj) >> 'canFloat');
+		_obj setVariable ['TAG_canFloat', _floatVal];
+	}; 
+	_canFloat = _floatVal > 0;
+	// Return:
+	_canFloat;
+}; */
+
+
 THY_fnc_SD_equipment_autoRemoval = {
 	// This function will notify the crewmen, if there vehicle rollover at protected zone, it'll be deleted after a countdown.
 	// Returns nothing.
@@ -47,8 +70,8 @@ THY_fnc_SD_equipment_autoRemoval = {
 	params ["_obj", "_rng", "_zonePos"];
 	private ["_crew", "_tol", "_timeout"];
 
-	// Take the current crew:
-	_crew = crew _obj;  // WIP - consider only human crewmen!
+	// take the current crew (but considering only the human ones):
+	_crew = ((crew _obj) select { alive _x && isPlayer _x }) - entities "HeadlessClient_F";
 	// Wait to see if the veh not just rollovered once before return to a regular position:
 	sleep 5;
 	// Escape:
@@ -131,7 +154,7 @@ THY_fnc_SD_protection_equipment = {
 	// Returns nothing.
 
 	params ["_zonesBySide", "_obj"];
-	private ["_rng", "_zonePos", "_var", "_isToRspwn"];
+	private ["_rng", "_zonePos", "_var", "_isToRspwn"/* , "_canFloat" */];
 
 	// Escape:
 		// Reserved space;
@@ -141,6 +164,7 @@ THY_fnc_SD_protection_equipment = {
 	_var     = vehicleVarName _obj;
 	// Declarations:
 	_isToRspwn = [_obj] call THY_fnc_SD_isUsing_respawn;
+	//_canFloat  = [_obj] call THY_fnc_SD_canFloat;
 	// If _obj still in-game:
 	while { alive _obj || _isToRspwn } do {
 		// if this equipment should be covered by respawn system:
@@ -152,7 +176,7 @@ THY_fnc_SD_protection_equipment = {
 		// Escape > Stop the looping (If Zeus delete the vehicle, for example, it will be NULL but still running if was a vehicle using a Respawn Vehicle Module):
 		if ( isNull _obj ) then { break };
 		// Debug server message:
-		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["Eqpnt: '%1' thread's running non-stop...", typeOf _obj] };
+		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["> '%1' searching protection...", typeOf _obj] };
 		//
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
@@ -161,7 +185,7 @@ THY_fnc_SD_protection_equipment = {
 			// if inside the protection range:
 			if ( _obj distance _zonePos <= _rng ) then {
 				// if respecting the speed limit:
-				if ( abs (speed _obj) <= SD_speedLimit ) then {
+				if ( abs (speed _obj) <= SD_speedLimit && abs ((velocity _obj) # 2) <= SD_velocityLimit ) then {
 					// Makes _obj unbreakable:
 					_obj allowDamage false;
 					// wait until the _obj (somehow) explodes, or get far away from zone, or exceed the speed limit, or rollover:
@@ -169,14 +193,22 @@ THY_fnc_SD_protection_equipment = {
 						// Looping breath:
 						sleep SD_checkDelay;
 						// Debug server message:
-						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj && !isNull _obj ) then { systemChat format ["Eqpnt: '%1' (w/ %2) standby...", typeOf _obj, name player] };
-						// Conditions to break the looping:
-						!alive _obj || _obj distance _zonePos > _rng || abs (speed _obj) > SD_speedLimit || (vectorUp _obj # 2) < SD_leanLimit;
+						if ( SD_isOnDebugGlobal && SD_isDebugDeeper && objectParent player isEqualTo _obj && !isNull _obj ) then { systemChat format ["> '%1' (w/ %2) keeps on standby.", typeOf _obj, name player] };
+						// If obj's dead:
+						!alive _obj ||
+						// If obj's not in zone:
+						_obj distance _zonePos > _rng ||
+						// if obj exceeded horizontal speed limit:
+						abs (speed _obj) > SD_speedLimit ||
+						// if obj exceeded vertical speed limit:
+						abs ((velocity _obj) # 2) > SD_velocityLimit ||
+						// if obj exceeded leaning limit:
+						(vectorUp _obj # 2) < SD_leanLimit
 					};
 					// If _obj still alive:
 					if ( alive _obj ) then {
 						// still inside the zone, and respecting the speed limit:
-						if ( _obj distance _zonePos <= _rng && abs (speed _obj) <= SD_speedLimit ) then {
+						if ( _obj distance _zonePos <= _rng && abs (speed _obj) <= SD_speedLimit && abs ((velocity _obj) # 2) <= SD_velocityLimit ) then {
 							// If _obj rollovered:
 							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
 								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;

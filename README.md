@@ -44,7 +44,8 @@ __
 - Added > New layer of protection called "Additional Protection" (turn ON/OFF) where the server checks separately unknown stuck vehicles or its wrecks, and remove them;
 - Fixed > Massive QA tests performed, addressing a few bugs already fixed;
 - Fixed > Non-protected vehicles, when destroyed inside the protected zone, their wrecks weren't deleted;
-- Improved > Protected vehicles, even when empty, must respect the speed limit inside the protected zone to maintain their protection;
+- Improved > Protected vehicles, even when empty, must respect the speed limit (horizontal and vertical) inside the protected zone to maintain their protection;
+- Improved > Players under the water with no diving gears, won't be immortal even in protected zones;
 - Improved > Better support to Zeus module;
 - Improved > Important debug improvements;
 - Documentation has been updated.

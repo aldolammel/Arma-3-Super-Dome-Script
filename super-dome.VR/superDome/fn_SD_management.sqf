@@ -89,7 +89,7 @@ if !isServer exitWith {};
 
 	// DONT TOUCH //////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Local variables declaration:
-	private ["_zones", "_mkr", "_rng", "_side"];
+	private ["_mkr", "_rng", "_side", "_zones"];
 	// Declarations - part 1/2:
 	SD_debugHeader = toUpper "SD DEBUG >";
 	// Declaring the global variables - part 1/2:
@@ -104,10 +104,11 @@ if !isServer exitWith {};
 	_rng                = 0;
 	_side               = nil;
 	// Declarations - part 2/2:
-	SD_warnHeader  = toUpper "SD WARNING >";
-	SD_alertHeader = toUpper "SUPERDOME INFO >";
-	SD_speedLimit  = 30;
-	SD_leanLimit   = 0.5;
+	SD_warnHeader    = toUpper "SD WARNING >";
+	SD_alertHeader   = toUpper "SUPERDOME INFO >";
+	SD_speedLimit    = 30;
+	SD_velocityLimit = 3;
+	SD_leanLimit     = 0.5;
 	// Building the array structure for further steps:
 	_zones = [
 		[_protectedMkr01, _mkrDisRange01, _mkrSide01, [], []],  // 3= [vehicles], 4= [ai units];
@@ -202,7 +203,7 @@ if !isServer exitWith {};
 	// Errors handling:
 	if ( SD_wait < 1 ) then { SD_wait = 1; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_wait' value CANNOT be less than 1. The value was fixed to the minimum.", SD_debugHeader] } }; if ( SD_vehDelTolerance < 10 ) then { SD_vehDelTolerance = 10; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_vehDelTolerance' value CANNOT be less than 10. The value was fixed to the minimum.", SD_debugHeader] } };	if ( count SD_scanVehTypes isEqualTo 0 ) then { SD_scanVehTypes = ["Car", "Tank", "Helicopter", "Motocycle"]; if SD_isOnDebugGlobal then { systemChat format ["%1 fn_SD_management.sqf > 'SD_scanVehTypes' looks empty. The basic vehicle types was set again.", SD_debugHeader] } }; if ( !SD_isOnDebugGlobal && SD_AdditionalProtectTimer < 20 ) then { systemChat format ["%1 fn_SD_management.sqf > You're using %2 secs for 'SD_AdditionalProtectTimer'. The minimum is 20. Fix it!", SD_warnHeader, SD_AdditionalProtectTimer]; SD_AdditionalProtectTimer = 60 };
 	// Declaring the global variables - part 2/2:
-	publicVariable "SD_warnHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait"; publicVariable "SD_isOnAdditionalProtection"; publicVariable "SD_AdditionalProtectTimer"; publicVariable "SD_isDebugDeeper";
+	publicVariable "SD_warnHeader"; publicVariable "SD_alertHeader"; publicVariable "SD_speedLimit"; publicVariable "SD_velocityLimit"; publicVariable "SD_leanLimit"; publicVariable "SD_zonesCollection"; publicVariable "SD_serverSideStatus"; publicVariable "SD_clientSideStatus"; publicVariable "SD_checkDelay"; publicVariable "SD_vehDelTolerance"; publicVariable "SD_scanVehTypes"; publicVariable "SD_wait"; publicVariable "SD_isOnAdditionalProtection"; publicVariable "SD_AdditionalProtectTimer"; publicVariable "SD_isDebugDeeper";
 };
 // return:
 true;

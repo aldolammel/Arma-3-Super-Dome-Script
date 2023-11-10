@@ -66,8 +66,8 @@ while { alive _unit } do {
 		_rng     = _x # 1;
 		// if _unit is into the base range:
 		if ( _unit distance _zonePos <= _rng ) then {
-			// if respecting the speed limit:
-			if ( abs (speed _unit) <= SD_speedLimit ) then {
+			// if respecting the speed limit, and can breath regularly:
+			if ( abs (speed _unit) <= SD_speedLimit && abs ((velocity _unit) # 2) <= SD_velocityLimit && isAbleToBreathe _unit ) then {
 				// Makes _unit immortal:
 				_unit allowDamage false;
 				// Message:
@@ -78,21 +78,51 @@ while { alive _unit } do {
 					sleep 1;
 				};
 				// Stay checking the unit until something break the checking:
-				waitUntil { sleep SD_checkDelay; !alive _unit || _unit distance _zonePos > _rng || abs (speed _unit) > SD_speedLimit };
+				waitUntil {
+					// Internal breath:
+					sleep SD_checkDelay;
+					// if unit's dead:
+					!alive _unit ||
+					// if unit's not in the zone:
+					_unit distance _zonePos > _rng ||
+					// if unit exceeded the horizontal speed:
+					abs (speed _unit) > SD_speedLimit ||
+					// if unit exceeded the vertical speed:
+					abs ((velocity _unit) # 2) > SD_velocityLimit ||
+					// if unit's deadly not breathing (underwater without diver gear):
+					!isAbleToBreathe _unit
+				};
 				// Restores the _unit mortality:
 				_unit allowDamage true;
-				// Message:
+				// Debug:
 				if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
-					systemChat format ["%1 You left the protected zone%2.",
-					SD_alertHeader, if SD_isOnDebugGlobal then {" (" + _zone + ")"} else {""}]; 
+					// If out of protected zone:
+					if ( _unit distance _zonePos > _rng ) then {
+						// Message:
+						systemChat format ["%1 You left the protected zone%2.",
+						SD_alertHeader, if SD_isOnDebugGlobal then {" (" + _zone + ")"} else {""}]; 
+					// Otherwise:
+					} else {
+						// Message:
+						systemChat format ["%1 You got broken a protection rule and are vulnerable.",
+						SD_alertHeader];
+					};
+					
 					// Message breath:
 					sleep 1;
 				};
 			} else {
 				// Warning:
 				if ( SD_isOnDebugGlobal || SD_isOnAlerts ) then {
-					// Message:
-					systemChat format ["%1 Protection disabled for a while: speed over to %2Km/h.", SD_alertHeader, SD_speedLimit];
+					if ( isAbleToBreathe _unit ) then {
+						// Message:
+						systemChat format ["%1 Protection compromised: exceeded speed limit.", SD_alertHeader];
+					// Otherwise:
+					} else {
+						// Message:
+						systemChat format ["%1 You got broken a protection rule and are vulnerable.",
+						SD_alertHeader];
+					};
 				}
 			};
 		};
