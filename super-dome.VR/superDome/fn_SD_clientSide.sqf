@@ -1,4 +1,4 @@
-// SUPER DOME v1.5
+// SUPER DOME v1.5.1
 // File: your_mission\superDome\fn_SD_clientSide.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -126,7 +126,7 @@ while { alive _unit } do {
 				}
 			};
 		};
-		// Breather:
+		// Breath:
 		sleep SD_checkDelay;
 	} forEach _sideZones;
 }; // while-looping ends.

@@ -1,4 +1,4 @@
-# Arma 3 / SD: Super Dome v1.5
+# Arma 3 / SD: Super Dome v1.5.1
 >*Dependencies: none.*
 
 SD is an Arma 3 script that's a smart protection against damage for players, vehicles, and AI units when they are within pre-defined zones. The protected zones have automatic removal of wrecks and rolled-over vehicles, in addition to small automation relating to the protected zone's integrity. Super-Dome script works both at the server layer and on each player's machine, allowing the editor to turn resources ON and OFF.
@@ -22,7 +22,7 @@ __
 - Turn ON/OFF the protected zones to cover all vehicles and static-weapons (turrets) inside;
 - Turn ON/OFF the protected zones to cover all AI units inside;
 - Turn ON/OFF the protected zones to cover all players by side;
-- NEW! - Support to Eden Respawn Vehicle Module; 
+- NEW! - Support to Eden Vehicle Respawn Module;
 - Auto-removal for wrecks and rolled over vehicles in the zone;
 - Smart speed limit (to disable the protection and accept hard collisions) and wreck delete when inside the zone;
 - Debugging: friendly feedback messages;
@@ -38,6 +38,10 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/244082-rele
 __
 
 ## CHANGELOG
+
+**Nov, 11th 2023 | v1.5.1**
+- Hotfix > When Eden Vehicle Respawn module is configured with lot of vehicles, and SD delete automatically the respawned vehicle wrecks, the module got lost;
+- Documentation has been updated.
 
 **Nov, 10th 2023 | v1.5**
 - Added > Support to missions with respawn-points for players, vehicles and static weapons (turrets);

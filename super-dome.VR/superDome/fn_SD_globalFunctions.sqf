@@ -1,4 +1,4 @@
-// SUPER DOME v1.5
+// SUPER DOME v1.5.1
 // File: your_mission\superDome\fn_SD_globalFunctions.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -26,7 +26,7 @@ THY_fnc_SD_isUsing_respawn = {
 	// This function checks if the object is using the Arma Respawn Vehicle Module.
 	// Returns _isUsing: bool.
 
-	params ["_obj"];
+	params ["_obj", ["_isOnMsg", true]];
 	private ["_isUsing"];
 
 	// Initial values:
@@ -35,6 +35,11 @@ THY_fnc_SD_isUsing_respawn = {
 		// Reserved space;
 	// Main function:
 	if ( !(_obj getVariable ["BIS_fnc_moduleRespawnVehicle_first", false]) && !isNil { _obj getVariable "BIS_fnc_moduleRespawnVehicle_mpKilled" } ) then { _isUsing = true };
+	// Debug:
+	if ( SD_isOnDebugGlobal && SD_isDebugDeeper && _isOnMsg ) then {
+		// Server message:
+		systemChat format ["> %1 > Respawn detected = %2.", typeOf _obj, if _isUsing then {"YES"} else {"NO"}];
+	};
 	// Return:
 	_isUsing;
 };
@@ -63,86 +68,28 @@ THY_fnc_SD_isUsing_respawn = {
 }; */
 
 
-THY_fnc_SD_equipment_autoRemoval = {
-	// This function will notify the crewmen, if there vehicle rollover at protected zone, it'll be deleted after a countdown.
+THY_fnc_SD_wreck_cleaner = {
+	// This function delete all unknown wrecks in the protected zone.
 	// Returns nothing.
 
-	params ["_obj", "_rng", "_zonePos"];
-	private ["_crew", "_tol", "_timeout"];
+	params ["_zonePos", "_rng"];
+	//private ["", "", ""];
 
-	// take the current crew (but considering only the human ones):
-	_crew = ((crew _obj) select { alive _x && isPlayer _x }) - entities "HeadlessClient_F";
-	// Wait to see if the veh not just rolled over once before return to a regular position:
-	sleep 5;
-	// Escape:
-	if ( (vectorUp _obj # 2) >= SD_leanLimit ) exitWith {};
 	// Initial values:
-	_tol = 0;
-	// If there's crew:
-	if (count _crew > 0) then { 
-		// Editor choice:
-		_tol = SD_vehDelTolerance;
-		// Player message (Mandatory):
-		[format ["%1 %2 secs left to turn over the equipment before its auto-removal!", SD_warnHeader, _tol]] remoteExec ["systemChat", _crew];
-	// If there is NO crew:
-	} else {
-		// Timeout is cutted by half:
-		_tol = (SD_vehDelTolerance / 2);
-		// Debug message for hosted server player (editor):
-		if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > %2 secs left to auto-removal of '%3'.", SD_debugHeader, _tol, typeOf _obj] };
-	};  
+		// Reserved space;
 	// Declarations:
-	_timeout = time + _tol;
-	// Waiting until the timeout runs, or veh pos be fixed, or veh explode, or be moved to out of zone:
-	waitUntil { sleep 5; time > _timeout || (vectorUp _obj # 2) >= SD_leanLimit || !alive _obj || _obj distance _zonePos > _rng };
-	// If veh still alive (Zeus can force a explosion or throw the veh out of zone):
-	if ( alive _obj ) then {
-		// If somehow the veh gets out of zone (helicopter out of control, for example):
-		if ( _obj distance _zonePos > _rng ) then { 
-			// Restore the veh fragility:
-			_obj allowDamage true;
-		// If still in zone:
-		} else {
-			// If the regular veh pos is recovered:
-			if ( (vectorUp _obj # 2) >= SD_leanLimit ) then {
-				// If there's crew:
-				if (count _crew > 0) then {
-					// Message to the crew (Mandatory):
-					[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
-				} else {
-					// Debug message:
-					if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _obj] };
-				};
-			// If veh still in a bad pos:
-			} else {
-				// Force the current crew (alive or unconscious) to leave the vehicle:
-				{ moveOut _x } forEach crew _obj;  // "crew _obj" will check only the current units inside the veh. Don't use _crew here!
-				// Animation breather:
-				sleep 0.5;
-				// ALTERNATIVALY: Delete the veh (but if the veh's using Arma Respawn Vehicle Module the veh won't spawn again)!
-				//deleteVehicle _obj;
-				// Destroy the vehicle:
-				_obj setDamage [1, false];
-				// Debug message:
-				if SD_isOnDebugGlobal then { format ["%1 ANTI-ROLLOVER > '%2' has been destroyed.", SD_warnHeader, typeOf _obj] call BIS_fnc_error };
-			};
+		// Reserved space;
+	{  // Delete all potential wrecks:
+		// Debug server message:
+		if SD_isOnDebugGlobal then {
+			systemChat format ["%1 ANTI-WRECK > '%2' was deleted!",
+			SD_debugHeader, typeOf _x];
 		};
-	// If somehow the veh blew up:
-	} else {
-		// If there's crew:
-		if (count _crew > 0) then {
-			// Message to the crew (Mandatory):
-			[format ["%1 Auto-removal canceled.", SD_alertHeader]] remoteExec ["systemChat", _crew];
-		} else {
-			// Debug message:
-			if SD_isOnDebugGlobal then { systemChat format ["%1 ANTI-ROLLOVER > Auto-removal canceled to '%2'.", SD_debugHeader, typeOf _obj] };
-		};
-		// Delete the wreck, if inside the zone:
-		if ( _obj distance _zonePos <= _rng ) then { 
-			// Delete the equipment:
-			deleteVehicle _obj;
-		};
-	};
+		// Delete the thing:
+		deleteVehicle _x;
+		// Breather:
+		sleep 0.5;
+	} forEach (allDead select { _x distance2D _zonePos <= _rng && !(_x isKindOf "Man") && !(_x isKindOf "House") && vehicleVarName _x isEqualTo "" });  // Critical: this vehicleVarName == "" prevent SD to delete wrecks from vehicles that will be respawn by Eden Vehicles Respawn module. If we delete those, that module lost the object reference.
 	// Return:
 	true;
 };
@@ -154,7 +101,7 @@ THY_fnc_SD_protection_equipment = {
 	// Returns nothing.
 
 	params ["_zonesBySide", "_obj"];
-	private ["_rng", "_zonePos", "_var", "_isToRspwn"/* , "_canFloat" */];
+	private ["_rng", "_zonePos", "_var", "_crew", "_isToRspwn"/* , "_canFloat" */];
 
 	// Escape:
 		// Reserved space;
@@ -162,6 +109,7 @@ THY_fnc_SD_protection_equipment = {
 	_rng     = 0;
 	_zonePos = [];
 	_var     = vehicleVarName _obj;
+	_crew    = [];
 	// Declarations:
 	_isToRspwn = [_obj] call THY_fnc_SD_isUsing_respawn;
 	//_canFloat  = [_obj] call THY_fnc_SD_canFloat;
@@ -170,13 +118,15 @@ THY_fnc_SD_protection_equipment = {
 		// if this equipment should be covered by respawn system:
 		if _isToRspwn then {
 			// WIP - Check how to know how much respawns are available if the Editor has set a limit respawn number in Arma Respawn Vehicle Module... Important to stop this thread when the equipment won't be spawned again!
-			// Address a possible new-vehicle-object by the original varName:
+			// If the object was destroyed, here is where we address the new-object to the original varName:
 			_obj = missionNamespace getVariable _var;
 		};
-		// Escape > Stop the looping (If Zeus delete the vehicle, for example, it will be NULL but still running if was a vehicle using a Respawn Vehicle Module):
+		// Escape > Stop the looping if after the getVariable fail or, e.g., Zeus delete the equipment (WIP = work to dont stop the thread if zeus force the veh delete):
 		if ( isNull _obj ) then { break };
+		// Escape > If Eden Vehicles Respawn is enabled for this equipment, but the equipment is destroyed, wait a while until respawn the while-loop:
+		if ( _isToRspwn && !alive _obj ) then { sleep SD_checkDelay; continue };
 		// Debug server message:
-		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["> '%1' searching protection...", typeOf _obj] };
+		if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then { systemChat format ["> '%1' searching protection...", str _obj] };
 		//
 		{  // forEach _zonesBySide:
 			// Internal Declarations:
@@ -211,7 +161,43 @@ THY_fnc_SD_protection_equipment = {
 						if ( _obj distance _zonePos <= _rng && abs (speed _obj) <= SD_speedLimit && abs ((velocity _obj) # 2) <= SD_velocityLimit ) then {
 							// If _obj rolled over:
 							if ( (vectorUp _obj # 2) < SD_leanLimit ) then {
-								[_obj, _rng, _zonePos] call THY_fnc_SD_equipment_autoRemoval;
+								// Wait to see if it was just a scary manuever:
+								sleep 8;
+								// Escape if everything is fine, otherwise, keep the punishment:
+								if ( (vectorUp _obj # 2) >= SD_leanLimit ) exitWith {};
+								// Restores the _obj original fragility:
+								_obj allowDamage true;
+								// take the current crew (but considering only the human ones):
+								_crew = ((crew _obj) select { alive _x && isPlayer _x }) - entities "HeadlessClient_F";
+								// if there are players as crew:
+								if ( count _crew > 0 ) then {
+									// Force the crew (alive or unconscious) to leave the vehicle:
+									{ moveOut _x } forEach _crew;
+									// Precaution, locking the equipment for players:
+									_obj lock 3;
+									// Mandatory player message:
+									[format ["%1 ANTI-ROLLOVER > For zone integrity, your equipment has been destroyed.", SD_alertHeader]] remoteExec ["systemChat", _crew];
+								// If no players as crew:
+								} else {
+									// If debug is on, warning server message:
+									if SD_isOnDebugGlobal then {
+										systemChat format ["%1 ANTI-ROLLOVER > '%2' (%3) has been destroyed.", SD_warnHeader, str _obj, typeOf _obj];
+									};
+								};
+								// If the equipement will spawn:
+								if _isToRspwn then {
+									// Breather for player get far away from the fire will come:
+									sleep 2;
+									// Destroy the vehicle:
+									// Critical: never delete the vehicle when Eden Verhicles Respawn is working. The wreck will be managed by that module.
+									_obj setDamage [1, false];
+								// Otherwise:
+								} else {
+									// Delete equipment to not leave a wreck:
+									deleteVehicle _obj;
+								};
+								// Stop the forEach:
+								break;
 							};
 						// Otherwise, if out of zone:
 						} else {
@@ -221,7 +207,9 @@ THY_fnc_SD_protection_equipment = {
 					// if _obj is destroyed:
 					} else {
 						// Delete the wreck, if inside the zone:
-						if ( _obj distance _zonePos <= _rng ) then { 
+						// Critical: don't delete this wreck if Eden Respawn Vehicle is activated (_isToRspwn) because the module will
+								// track this wreck and, if SD delete it, the ERV will lost the objet and SD will badly finish the thread!
+						if ( !_isToRspwn && _obj distance _zonePos <= _rng ) then { 
 							// Delete equipment:
 							deleteVehicle _obj;
 						};
@@ -335,7 +323,7 @@ THY_fnc_SD_debugMonitor = {
 			if SD_isOnShowMarkers then {"ON"} else {"OFF"},
 			if SD_isOnZeusWhenDebug then {"ON"} else {"OFF"},
 			if (!isNull (objectParent _unit)) then {if (isDamageAllowed (objectParent _unit)) then {"Is your veh protected: NOPE!\n"} else {"Is your veh protected: YES!\n"}} else {""},
-			if (!isNull (objectParent _unit)) then {if ([objectParent _unit] call THY_fnc_SD_isUsing_respawn) then {"Respawn available for: YES\n"} else {"Respawn available for: NO\n"}} else {""},
+			if (!isNull (objectParent _unit)) then {if ([objectParent _unit, false] call THY_fnc_SD_isUsing_respawn) then {"Respawn available for: YES\n"} else {"Respawn available for: NO\n"}} else {""},
 			if SD_isDebugDeeper then {"\nExtra debug information: ON\n"} else {""},
 			if SD_isOnAdditionalProtection then {"ON\nNew checks after: "} else {"OFF\n"},
 			if SD_isOnAdditionalProtection then {(str SD_AdditionalProtectTimer) + "s\n"} else {""},

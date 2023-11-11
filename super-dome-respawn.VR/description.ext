@@ -12,9 +12,9 @@ class Header {
 	
 	// Gameplay
 	joinUnassigned     = 0;
-	respawnButton      = 1;
 	enableTeamSwitch   = true;
 	respawn            = 3;
+	respawnButton      = 1;
 	respawnOnStart     = 1;  // -1 = Dont respawn on start and don't run respawn script on start. / 0 = Dont respawn on start but run respawn script on start. / 1 = Respawn on start. Run respawn script on start.
 	respawnDelay       = 5;
 	respawnTemplates[] = { "MenuPosition", "MenuInventory", "Wave" };

@@ -1,4 +1,4 @@
-// SUPER DOME v1.5
+// SUPER DOME v1.5.1
 // File: your_mission\superDome\fn_SD_serverSide.sqf
 // Documentation: your_mission\superDome\_SD_Documentation.pdf
 // by thy (@aldolammel)
@@ -48,7 +48,7 @@ if !isServer exitWith {};
 		_side    = (SD_zonesCollection # _i) # 2;
 		_zonePos = getMarkerPos _mkr;
 		/*
-			HASHMAP:
+			ARRAY MAP:
 			SD_zonesCollection = [
 				0= [ 0= marker1 classname, 1= range integer, 2= side it belongs, 3= [ veh1, ... ], 4= [ aiUnit1, ... ] ],
 				1= [ 0= marker2 classname, 1= range integer, 2= side it belongs, 3= [ veh1, ... ], 4= [ aiUnit1, ... ] ],
@@ -104,7 +104,7 @@ if !isServer exitWith {};
 			case INDEPENDENT: { (_zonesAllSides # 2) pushBack [_mkr, _rng, _zonePos, _vehsByZone, _aiUnitsByZone] };
 			case CIVILIAN:    { (_zonesAllSides # 3) pushBack [_mkr, _rng, _zonePos, _vehsByZone, _aiUnitsByZone] };
 			/*
-				HASHMAP:
+				ARRAY MAP:
 				_zonesAllSides = [
 					0=[ blu
 						0=[ zone
@@ -173,10 +173,10 @@ if !isServer exitWith {};
 				// Debug server message:
 				if ( SD_isOnDebugGlobal && SD_isDebugDeeper ) then {
 					// Make objs more readable:
-					{ _objTypesByZone pushBack (typeOf _x) } forEach _vehsByZone;
+					//{ _objTypesByZone pushBack (typeOf _x) } forEach _vehsByZone;
 					// Message:
 					systemChat format ["%1 %2 > Z%3 > EQPNTS:", SD_debugHeader, _tag, (_zonesBySide find _x)+1];
-					systemChat format ["%1.", if (count _vehsByZone > 0) then {str _objTypesByZone} else {"No equipment was found"}];
+					systemChat format ["%1.", if (count _vehsByZone > 0) then {str /* _objTypesByZone */ _vehsByZone} else {"No equipment was found"}];
 					// Clean variable:
 					_objTypesByZone = [];
 					// Breather:
@@ -227,22 +227,12 @@ if !isServer exitWith {};
 				// those aren't watched by Super-Dome:
 				!(_x in _allProtectedVehs) &&
 				// those apparently rolled over:
-				(vectorUp _x # 2) < SD_leanLimit 
+				(vectorUp _x # 2) < SD_leanLimit
 			};
 			// Destroy them:
 			if ( count _dangerEqpnts > 0 ) then { { _x setDamage [1, false]; sleep 0.5 } forEach _dangerEqpnts };
-			//
-			{  // Delete all potential wrecks:
-				// Debug server message:
-				if SD_isOnDebugGlobal then {
-					format ["%1 ANTI-WRECK > '%2' was deleted!",
-					SD_debugHeader, typeOf _x] call BIS_fnc_error;
-				};
-				// Delete the thing:
-				deleteVehicle _x;
-				// Breather:
-				sleep SD_checkDelay;
-			} forEach (allDead select { _x distance2D _zonePos <= _rng && !(_x isKindOf "Man") && !(_x isKindOf "House") });
+			// Delete the unknown wrecks:
+			[_zonePos, _rng] call THY_fnc_SD_wreck_cleaner;
 			// Internal breather:
 			sleep SD_checkDelay;
 		};  // for-loop ends.
