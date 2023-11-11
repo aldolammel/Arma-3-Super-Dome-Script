@@ -31,7 +31,7 @@ if !isServer exitWith {};
 			private _mkrDisRange01  = 50;                // in meters, the protection range of the marker 1. Minimum 50.
 			private _mkrSide01      = BLUFOR;             // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
-			private _protectedMkr02 = "superdome_1";  // Protected zone marker 2 name.
+			private _protectedMkr02 = "superdome_2";  // Protected zone marker 2 name.
 			private _mkrDisRange02  = 50;                // in meters, the protection range of the marker 2. Minimum 50.
 			private _mkrSide02      = BLUFOR;             // Options: BLUFOR, OPFOR, INDEPENDENT, CIVILIAN.
 
